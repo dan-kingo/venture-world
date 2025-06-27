@@ -1,0 +1,36 @@
+# Node modules
+backend/node_modules
+mobile/node_modules
+web/node_modules
+
+# Build outputs
+backend/dist
+mobile/dist
+web/dist
+
+# Expo specific
+mobile/.expo
+mobile/.expo-shared
+
+# Environment variables
+backend/.env
+mobile/.env
+web/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+
+# Optional: Ignore coverage reports (if you add testing)
+coverage/
