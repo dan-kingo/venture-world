@@ -21,7 +21,8 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Missing or invalid token" });
+     res.status(401).json({ message: "Missing or invalid token" });
+     return
   }
 
   const token = authHeader.split(" ")[1];
@@ -32,7 +33,8 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     const user = await User.findOne({ firebaseUid: decodedToken.uid });
 
     if (!user) {
-      return res.status(401).json({ message: "User not found" });
+       res.status(401).json({ message: "User not found" });
+       return
     }
 
     req.user = {
@@ -50,7 +52,8 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 export const authorize = (roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Forbidden" });
+       res.status(403).json({ message: "Forbidden" });
+       return
     }
     next();
   };
