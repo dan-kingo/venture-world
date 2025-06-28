@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import Booking from "../models/booking.model";
 import Experience from "../models/experience.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import User from "../models/user.model";
+import { sendExpoNotification } from "../utils/expoNotification";
 
 /**
  * @desc Traveler submits booking
@@ -32,12 +34,24 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
 
     await booking.save();
 
+    // Notify the provider
+    const provider = await User.findById(experience.provider);
+
+    if (provider?.expoPushToken) {
+      await sendExpoNotification(
+        provider.expoPushToken,
+        "New Booking Received",
+        `Someone has submitted a booking for your experience: ${experience.title}`
+      );
+    }
+
     res.status(201).json({ message: "Booking submitted", booking });
   } catch (err) {
     console.error("Error creating booking:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 /**
  * @desc Traveler views their bookings
