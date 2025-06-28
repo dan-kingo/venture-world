@@ -86,7 +86,7 @@ export default function WelcomeScreen() {
           <Animated.View style={[styles.buttonContainer, buttonAnimatedStyle]}>
             <Button
               mode="contained"
-              onPress={() => router.push('/language')}
+              onPress={() => router.push('/(auth)/language')}
               style={styles.primaryButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
@@ -96,7 +96,7 @@ export default function WelcomeScreen() {
             
             <Button
               mode="outlined"
-              onPress={() => router.push('/login')}
+              onPress={() => router.push('/(auth)/login')}
               style={styles.secondaryButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.secondaryButtonLabel}

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Text, TextInput, Button, IconButton } from 'react-native-paper';
+import { Text, TextInput, Button, IconButton, Card } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
@@ -33,6 +33,23 @@ export default function LoginScreen() {
     }
   };
 
+  // Demo accounts for testing
+  const demoAccounts = [
+    { email: 'john@example.com', password: 'password123', role: 'Traveler' },
+    { email: 'sarah@example.com', password: 'password123', role: 'Provider' },
+    { email: 'admin@example.com', password: 'admin123', role: 'Admin' },
+  ];
+
+  const fillDemoAccount = (email: string, password: string) => {
+    // This would typically use setValue from react-hook-form
+    // For now, we'll just show an alert with the credentials
+    Alert.alert(
+      'Demo Account',
+      `Email: ${email}\nPassword: ${password}\n\nPlease enter these credentials manually.`,
+      [{ text: 'OK' }]
+    );
+  };
+
   return (
     <LinearGradient
       colors={[colors.background, colors.surface]}
@@ -52,6 +69,24 @@ export default function LoginScreen() {
               />
               <Text style={styles.title}>Welcome Back</Text>
               <Text style={styles.subtitle}>Sign in to continue your journey</Text>
+            </Animated.View>
+
+            {/* Demo Accounts */}
+            <Animated.View entering={FadeInDown.delay(300)} style={styles.demoSection}>
+              <Text style={styles.demoTitle}>Demo Accounts (Mock Login)</Text>
+              {demoAccounts.map((account, index) => (
+                <Card
+                  key={index}
+                  style={styles.demoCard}
+                  onPress={() => fillDemoAccount(account.email, account.password)}
+                >
+                  <Card.Content style={styles.demoContent}>
+                    <Text style={styles.demoRole}>{account.role}</Text>
+                    <Text style={styles.demoEmail}>{account.email}</Text>
+                    <Text style={styles.demoPassword}>Password: {account.password}</Text>
+                  </Card.Content>
+                </Card>
+              ))}
             </Animated.View>
 
             {/* Form */}
@@ -154,7 +189,7 @@ export default function LoginScreen() {
               <Text style={styles.registerText}>Don't have an account? </Text>
               <Button
                 mode="text"
-                onPress={() => router.push('/register')}
+                onPress={() => router.push('/(auth)/register')}
                 labelStyle={styles.registerButtonLabel}
               >
                 Sign Up
@@ -184,7 +219,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: spacing.xl,
+    marginBottom: spacing.lg,
   },
   backButton: {
     alignSelf: 'flex-start',
@@ -202,6 +237,39 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  demoSection: {
+    marginBottom: spacing.lg,
+  },
+  demoTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-Bold',
+    color: colors.primary,
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  demoCard: {
+    backgroundColor: colors.surface,
+    marginBottom: spacing.sm,
+    borderRadius: 12,
+  },
+  demoContent: {
+    padding: spacing.sm,
+  },
+  demoRole: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: colors.primary,
+  },
+  demoEmail: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: colors.text,
+  },
+  demoPassword: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: colors.textSecondary,
   },
   form: {
     marginBottom: spacing.xl,

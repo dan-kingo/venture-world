@@ -21,7 +21,7 @@ export default function LanguageScreen() {
 
   const handleContinue = async () => {
     await setLanguage(selectedLanguage);
-    router.push('/register');
+    router.push('/(auth)/register');
   };
 
   const renderLanguageItem = ({ item, index }: { item: typeof languages[0]; index: number }) => (

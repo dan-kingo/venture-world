@@ -108,14 +108,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const user = JSON.parse(storedUser);
         set({ user, isAuthenticated: true });
       }
-
-      // Listen for auth state changes
-      authAPI.onAuthStateChanged((firebaseUser) => {
-        if (!firebaseUser && get().isAuthenticated) {
-          // User signed out from Firebase, update local state
-          set({ user: null, isAuthenticated: false });
-        }
-      });
     } catch (error) {
       console.error('Auth initialization error:', error);
     }

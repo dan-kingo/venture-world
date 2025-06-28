@@ -1,39 +1,5 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { initializeApp } from 'firebase/app';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  initializeAuth, 
-  onAuthStateChanged,
-  getAuth
-} from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBbQ5l0PueNEGeWKn9jvf6DrYlX60atoJk",
-  authDomain: "venture-world-1123.firebaseapp.com",
-  projectId: "venture-world-1123",
-  storageBucket: "venture-world-1123.firebasestorage.app",
-  messagingSenderId: "483733490793",
-  appId: "1:483733490793:web:67a111b328a44f7650e6f8",
-  measurementId: "G-L256W2HEEC"
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-
-// Initialize Auth with proper persistence for React Native
-let auth;
-try {
-  auth = initializeAuth(firebaseApp, {
-    persistence: ReactNativeAsyncStorage
-  });
-} catch (error) {
-  // If already initialized, get the existing instance
-  auth = getAuth(firebaseApp);
-}
 
 // Backend URL - update this to match your backend server
 const API_BASE_URL = __DEV__ ? 'http://localhost:3000/api' : 'https://your-production-api.com/api';
@@ -82,40 +48,62 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
+// Mock users for testing
+const mockUsers = [
+  {
+    id: '1',
+    name: 'John Traveler',
+    email: 'john@example.com',
+    password: 'password123',
+    role: 'traveler',
+    interests: ['Culture', 'History', 'Adventure'],
+    firebaseUid: 'mock-uid-1',
+  },
+  {
+    id: '2',
+    name: 'Sarah Provider',
+    email: 'sarah@example.com',
+    password: 'password123',
+    role: 'provider',
+    interests: ['Tourism', 'Culture'],
+    firebaseUid: 'mock-uid-2',
+  },
+  {
+    id: '3',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    password: 'admin123',
+    role: 'admin',
+    interests: [],
+    firebaseUid: 'mock-uid-3',
+  },
+];
+
+// Auth API with mock implementation
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Find user in mock data
+      const user = mockUsers.find(u => u.email === email && u.password === password);
+      
+      if (!user) {
+        throw new Error('Invalid credentials');
+      }
+      
+      // Generate mock token
+      const token = `mock-token-${user.id}-${Date.now()}`;
       
       // Save token to SecureStore
       await SecureStore.setItemAsync('authToken', token);
       
-      // Get user data from your backend
-      try {
-        const response = await api.get('/me');
-        const userData = response.data;
-        
-        if (userData) {
-          await SecureStore.setItemAsync('user', JSON.stringify(userData));
-        }
-        
-        return userData;
-      } catch (backendError) {
-        // If backend is not available, create user data from Firebase
-        const userData = {
-          id: userCredential.user.uid,
-          name: userCredential.user.displayName || 'User',
-          email: userCredential.user.email,
-          role: 'traveler',
-          interests: [],
-          firebaseUid: userCredential.user.uid,
-        };
-        
-        await SecureStore.setItemAsync('user', JSON.stringify(userData));
-        return userData;
-      }
+      // Remove password from user data
+      const { password: _, ...userData } = user;
+      
+      await SecureStore.setItemAsync('user', JSON.stringify(userData));
+      return userData;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -124,38 +112,36 @@ export const authAPI = {
 
   register: async (userData: any) => {
     try {
-      const { email, password, ...rest } = userData;
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Check if email already exists
+      const existingUser = mockUsers.find(u => u.email === userData.email);
+      if (existingUser) {
+        throw new Error('Email already exists');
+      }
+      
+      // Create new user
+      const newUser = {
+        id: `mock-${Date.now()}`,
+        firebaseUid: `mock-uid-${Date.now()}`,
+        ...userData,
+      };
+      
+      // Add to mock users (in real app, this would be saved to backend)
+      mockUsers.push({ ...newUser, password: userData.password });
+      
+      // Generate mock token
+      const token = `mock-token-${newUser.id}-${Date.now()}`;
       
       // Save token to SecureStore
       await SecureStore.setItemAsync('authToken', token);
       
-      // Try to create user profile in your backend
-      try {
-        const response = await api.post('/auth/setup', {
-          firebaseUid: userCredential.user.uid,
-          email,
-          ...rest
-        });
-        
-        if (response.data) {
-          await SecureStore.setItemAsync('user', JSON.stringify(response.data.user));
-        }
-        
-        return response.data.user;
-      } catch (backendError) {
-        // If backend is not available, create user data locally
-        const newUserData = {
-          id: userCredential.user.uid,
-          email,
-          firebaseUid: userCredential.user.uid,
-          ...rest
-        };
-        
-        await SecureStore.setItemAsync('user', JSON.stringify(newUserData));
-        return newUserData;
-      }
+      // Remove password from user data
+      const { password: _, ...userDataWithoutPassword } = newUser;
+      
+      await SecureStore.setItemAsync('user', JSON.stringify(userDataWithoutPassword));
+      return userDataWithoutPassword;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -164,7 +150,6 @@ export const authAPI = {
 
   logout: async () => {
     try {
-      await auth.signOut();
       await SecureStore.deleteItemAsync('authToken');
       await SecureStore.deleteItemAsync('user');
     } catch (error) {
@@ -174,34 +159,31 @@ export const authAPI = {
 
   setupProfile: async (profileData: any) => {
     try {
-      const response = await api.post('/auth/setup', profileData);
-      return response.data;
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      return { success: true, user: profileData };
     } catch (error) {
       console.error('Setup profile error:', error);
-      // Return mock success if backend is not available
       return { success: true, user: profileData };
     }
   },
 
   getProfile: async () => {
     try {
-      const response = await api.get('/me');
-      if (response.data) {
-        await SecureStore.setItemAsync('user', JSON.stringify(response.data));
-      }
-      return response.data;
-    } catch (error) {
-      console.error('Get profile error:', error);
-      // Return stored user data if backend is not available
+      // Return stored user data
       const storedUser = await SecureStore.getItemAsync('user');
       return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error('Get profile error:', error);
+      return null;
     }
   },
 
-  getCurrentUser: () => auth.currentUser,
+  getCurrentUser: () => null, // Mock implementation
   
   onAuthStateChanged: (callback: (user: any) => void) => {
-    return onAuthStateChanged(auth, callback);
+    // Mock implementation - return unsubscribe function
+    return () => {};
   },
 };
 
@@ -284,5 +266,4 @@ export const itinerariesAPI = {
   },
 };
 
-export { auth };
 export default api;
