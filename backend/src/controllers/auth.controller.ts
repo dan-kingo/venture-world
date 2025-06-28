@@ -44,7 +44,7 @@ export const register = async (req: Request, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -97,7 +97,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -131,7 +131,17 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    res.json(user);
+    const userResponse = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      interests: user.interests,
+      status: user.status,
+    };
+
+    res.json(userResponse);
   } catch (error) {
     console.error("Error fetching user:", error);
     res.status(500).json({ message: "Server error" });
@@ -163,7 +173,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
       phone: user.phone,
