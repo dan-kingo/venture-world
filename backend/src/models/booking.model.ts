@@ -1,8 +1,6 @@
 import { Schema, model } from "mongoose";
 import { IBooking } from "../types/booking";
 
-
-
 const bookingSchema = new Schema<IBooking>(
   {
     experience: { type: Schema.Types.ObjectId, ref: "Experience", required: true },

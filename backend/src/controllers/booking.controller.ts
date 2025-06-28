@@ -26,9 +26,17 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Find the user by Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
     const booking = new Booking({
       experience: experienceId,
-      traveler: req.user?.uid,
+      traveler: user._id, // Use MongoDB ObjectId
       status: "pending",
     });
 
@@ -59,7 +67,15 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
  */
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   try {
-    const bookings = await Booking.find({ traveler: req.user?.uid })
+    // Find the user by Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const bookings = await Booking.find({ traveler: user._id })
       .populate("experience", "title category")
       .sort({ createdAt: -1 });
 

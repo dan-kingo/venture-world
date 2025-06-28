@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Experience from "../models/experience.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
+import User from "../models/user.model";
 
 /**
  * @desc Provider submits new experience
@@ -16,13 +17,21 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Find the user by Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
     const experience = new Experience({
       title,
       description,
       image,
       price,
       category,
-      provider: req.user?.uid,
+      provider: user._id, // Use MongoDB ObjectId
       status: "pending",
     });
 
@@ -57,7 +66,15 @@ export const getApprovedExperiences = async (req: Request, res: Response) => {
  */
 export const getMyExperiences = async (req: AuthRequest, res: Response) => {
   try {
-    const experiences = await Experience.find({ provider: req.user?.uid });
+    // Find the user by Firebase UID
+    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const experiences = await Experience.find({ provider: user._id });
 
     res.json(experiences);
   } catch (err) {

@@ -1,7 +1,13 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { initializeApp } from 'firebase/app';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence, onAuthStateChanged } from 'firebase/auth';
+import { 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  initializeAuth, 
+  onAuthStateChanged,
+  getAuth
+} from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
 // Firebase configuration
@@ -17,9 +23,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
-const auth = initializeAuth(firebaseApp, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+
+// Initialize Auth with proper persistence for React Native
+let auth;
+try {
+  auth = initializeAuth(firebaseApp, {
+    persistence: ReactNativeAsyncStorage
+  });
+} catch (error) {
+  // If already initialized, get the existing instance
+  auth = getAuth(firebaseApp);
+}
 
 // Backend URL - update this to match your backend server
 const API_BASE_URL = __DEV__ ? 'http://localhost:3000/api' : 'https://your-production-api.com/api';

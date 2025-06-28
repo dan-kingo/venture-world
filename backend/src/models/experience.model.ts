@@ -1,8 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 import { IExperience } from "../types/experience";
 
-
-
 const experienceSchema = new Schema<IExperience>(
   {
     title: { type: String, required: true },
