@@ -5,14 +5,11 @@ import { WebView } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
+import { colors, spacing } from '../src/theme/theme';
 
 const { width, height } = Dimensions.get('window');
-
-interface VRScreenProps {
-  navigation: any;
-}
 
 const vrExperiences = [
   {
@@ -41,7 +38,7 @@ const vrExperiences = [
   },
 ];
 
-export default function VRScreen({ navigation }: VRScreenProps) {
+export default function VRScreen() {
   const [selectedExperience, setSelectedExperience] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -144,7 +141,7 @@ export default function VRScreen({ navigation }: VRScreenProps) {
             icon="arrow-left"
             iconColor={colors.primary}
             size={24}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             style={styles.headerBackButton}
           />
           <Text style={styles.headerTitle}>VR Experiences</Text>
@@ -336,7 +333,7 @@ const styles = StyleSheet.create({
   experienceDescription: {
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
-    color: colors.textSecondary,
+    color: colors.text,
     lineHeight: 20,
     marginBottom: spacing.sm,
   },

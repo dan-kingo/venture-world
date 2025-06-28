@@ -4,18 +4,15 @@ import { Text, Card, Button, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useAuthStore } from '../../store/authStore';
-import { useExperienceStore } from '../../store/experienceStore';
+import { colors, spacing } from '../../src/theme/theme';
+import { useAuthStore } from '../../src/store/authStore';
+import { useExperienceStore } from '../../src/store/experienceStore';
 
 const { width } = Dimensions.get('window');
 
-interface HomeScreenProps {
-  navigation: any;
-}
-
-export default function HomeScreen({ navigation }: HomeScreenProps) {
+export default function HomeScreen() {
   const { user } = useAuthStore();
   const { featuredExperiences, fetchFeaturedExperiences, isLoading } = useExperienceStore();
 
@@ -28,21 +25,21 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       title: 'AR Experience',
       icon: '📱',
       description: 'Explore in AR',
-      onPress: () => navigation.navigate('AR'),
+      onPress: () => router.push('/ar'),
       gradient: [colors.primary, colors.secondary],
     },
     {
       title: 'VR Tours',
       icon: '🥽',
       description: 'Virtual Reality',
-      onPress: () => navigation.navigate('VR'),
+      onPress: () => router.push('/vr'),
       gradient: [colors.secondary, colors.accent],
     },
     {
       title: 'Smart Itinerary',
       icon: '🗺️',
       description: 'AI Suggestions',
-      onPress: () => navigation.navigate('Itinerary'),
+      onPress: () => router.push('/itinerary'),
       gradient: [colors.accent, colors.primary],
     },
   ];
@@ -105,7 +102,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               <Text style={styles.sectionTitle}>Featured Experiences</Text>
               <Button
                 mode="text"
-                onPress={() => navigation.navigate('Explore')}
+                onPress={() => router.push('/(tabs)/explore')}
                 labelStyle={styles.seeAllButton}
               >
                 See All
@@ -119,7 +116,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               >
                 <Card
                   style={styles.experienceCard}
-                  onPress={() => navigation.navigate('ExperienceDetail', { experience })}
+                  onPress={() => router.push(`/experience/${experience.id}`)}
                 >
                   <Card.Cover
                     source={{ uri: experience.image }}
@@ -162,7 +159,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
                 </Text>
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('Explore')}
+                  onPress={() => router.push('/(tabs)/explore')}
                   style={styles.exploreButton}
                   labelStyle={styles.exploreButtonLabel}
                 >

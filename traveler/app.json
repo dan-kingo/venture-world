@@ -37,6 +37,7 @@
     "plugins": [
       "expo-camera",
       "expo-av",
+      "expo-router",
       [
         "expo-notifications",
         {
@@ -44,6 +45,7 @@
           "color": "#FFD700"
         }
       ]
-    ]
+    ],
+    "scheme": "venture-world"
   }
 }

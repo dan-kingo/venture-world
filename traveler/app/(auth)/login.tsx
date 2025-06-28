@@ -5,20 +5,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useAuthStore } from '../../store/authStore';
-
-interface LoginScreenProps {
-  navigation: any;
-}
+import { colors, spacing } from '../../src/theme/theme';
+import { useAuthStore } from '../../src/store/authStore';
 
 interface LoginForm {
   email: string;
   password: string;
 }
 
-export default function LoginScreen({ navigation }: LoginScreenProps) {
+export default function LoginScreen() {
   const { login, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -50,7 +47,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                 icon="arrow-left"
                 iconColor={colors.primary}
                 size={24}
-                onPress={() => navigation.goBack()}
+                onPress={() => router.back()}
                 style={styles.backButton}
               />
               <Text style={styles.title}>Welcome Back</Text>
@@ -157,7 +154,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
               <Text style={styles.registerText}>Don't have an account? </Text>
               <Button
                 mode="text"
-                onPress={() => navigation.navigate('Register')}
+                onPress={() => router.push('/(auth)/register')}
                 labelStyle={styles.registerButtonLabel}
               >
                 Sign Up

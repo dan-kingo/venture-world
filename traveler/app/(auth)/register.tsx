@@ -5,13 +5,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useAuthStore } from '../../store/authStore';
-
-interface RegisterScreenProps {
-  navigation: any;
-}
+import { colors, spacing } from '../../src/theme/theme';
+import { useAuthStore } from '../../src/store/authStore';
 
 interface RegisterForm {
   name: string;
@@ -25,7 +22,7 @@ const interestOptions = [
   'Culture', 'History', 'Adventure', 'Nature', 'Food', 'Art', 'Music', 'Photography'
 ];
 
-export default function RegisterScreen({ navigation }: RegisterScreenProps) {
+export default function RegisterScreen() {
   const { register, isLoading } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -54,6 +51,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
         name: data.name,
         email: data.email,
         phone: data.phone,
+        password: data.password,
         role: 'traveler',
         interests: selectedInterests,
       });
@@ -76,7 +74,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
                 icon="arrow-left"
                 iconColor={colors.primary}
                 size={24}
-                onPress={() => navigation.goBack()}
+                onPress={() => router.back()}
                 style={styles.backButton}
               />
               <Text style={styles.title}>Create Account</Text>
@@ -280,7 +278,7 @@ export default function RegisterScreen({ navigation }: RegisterScreenProps) {
               <Text style={styles.loginText}>Already have an account? </Text>
               <Button
                 mode="text"
-                onPress={() => navigation.navigate('Login')}
+                onPress={() => router.push('/(auth)/login')}
                 labelStyle={styles.loginButtonLabel}
               >
                 Sign In

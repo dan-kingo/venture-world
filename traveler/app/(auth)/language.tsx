@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { Text, Button, Card, RadioButton } from 'react-native-paper';
+import { Text, Button, Card, RadioButton, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useAuthStore } from '../../store/authStore';
-
-interface LanguageScreenProps {
-  navigation: any;
-}
+import { colors, spacing } from '../../src/theme/theme';
+import { useAuthStore } from '../../src/store/authStore';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -18,13 +15,13 @@ const languages = [
   { code: 'or', name: 'Afaan Oromo', flag: '🇪🇹' },
 ];
 
-export default function LanguageScreen({ navigation }: LanguageScreenProps) {
+export default function LanguageScreen() {
   const { language, setLanguage } = useAuthStore();
   const [selectedLanguage, setSelectedLanguage] = useState(language);
 
   const handleContinue = async () => {
     await setLanguage(selectedLanguage);
-    navigation.navigate('Register');
+    router.push('/(auth)/register');
   };
 
   const renderLanguageItem = ({ item, index }: { item: typeof languages[0]; index: number }) => (
@@ -54,6 +51,13 @@ export default function LanguageScreen({ navigation }: LanguageScreenProps) {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.content}>
           <Animated.View entering={FadeInDown.delay(200)} style={styles.header}>
+            <IconButton
+              icon="arrow-left"
+              iconColor={colors.primary}
+              size={24}
+              onPress={() => router.back()}
+              style={styles.backButton}
+            />
             <Text style={styles.title}>Choose Your Language</Text>
             <Text style={styles.subtitle}>
               Select your preferred language for the best experience
@@ -100,6 +104,10 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: spacing.xl,
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.md,
   },
   title: {
     fontSize: 28,

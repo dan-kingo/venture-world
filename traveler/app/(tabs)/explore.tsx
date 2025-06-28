@@ -4,19 +4,16 @@ import { Text, Card, Searchbar, Chip, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useExperienceStore } from '../../store/experienceStore';
+import { colors, spacing } from '../../src/theme/theme';
+import { useExperienceStore } from '../../src/store/experienceStore';
 
 const { width } = Dimensions.get('window');
 
-interface ExploreScreenProps {
-  navigation: any;
-}
-
 const categories = ['All', 'AR site', 'eco-tour', 'heritage'];
 
-export default function ExploreScreen({ navigation }: ExploreScreenProps) {
+export default function ExploreScreen() {
   const { experiences, fetchExperiences, isLoading } = useExperienceStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -50,7 +47,7 @@ export default function ExploreScreen({ navigation }: ExploreScreenProps) {
     <Animated.View entering={FadeInDown.delay(index * 100)}>
       <Card
         style={styles.experienceCard}
-        onPress={() => navigation.navigate('ExperienceDetail', { experience: item })}
+        onPress={() => router.push(`/experience/${item.id}`)}
       >
         <Card.Cover source={{ uri: item.image }} style={styles.experienceImage} />
         <Card.Content style={styles.experienceContent}>

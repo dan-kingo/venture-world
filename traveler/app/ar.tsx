@@ -4,16 +4,13 @@ import { Text, Button, IconButton, Card } from 'react-native-paper';
 import { Camera, CameraView } from 'expo-camera';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
+import { colors, spacing } from '../src/theme/theme';
 
 const { width, height } = Dimensions.get('window');
 
-interface ARScreenProps {
-  navigation: any;
-}
-
-export default function ARScreen({ navigation }: ARScreenProps) {
+export default function ARScreen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isARActive, setIsARActive] = useState(false);
   const [arInfo, setArInfo] = useState<any>(null);
@@ -61,7 +58,7 @@ export default function ARScreen({ navigation }: ARScreenProps) {
         <Text style={styles.permissionText}>No access to camera</Text>
         <Button
           mode="contained"
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
           style={styles.backButton}
         >
           Go Back
@@ -85,7 +82,7 @@ export default function ARScreen({ navigation }: ARScreenProps) {
               icon="arrow-left"
               iconColor={colors.text}
               size={24}
-              onPress={() => navigation.goBack()}
+              onPress={() => router.back()}
               style={styles.backIconButton}
             />
             <Text style={styles.headerTitle}>AR Experience</Text>

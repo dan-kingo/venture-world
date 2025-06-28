@@ -7,20 +7,16 @@ import Animated, {
   useAnimatedStyle, 
   withTiming, 
   withSpring,
-  withSequence,
   withDelay
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
+import { colors, spacing } from '../../src/theme/theme';
 
 const { width, height } = Dimensions.get('window');
 
-interface WelcomeScreenProps {
-  navigation: any;
-}
-
-export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
+export default function WelcomeScreen() {
   const logoScale = useSharedValue(0);
   const titleOpacity = useSharedValue(0);
   const subtitleOpacity = useSharedValue(0);
@@ -90,7 +86,7 @@ export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
           <Animated.View style={[styles.buttonContainer, buttonAnimatedStyle]}>
             <Button
               mode="contained"
-              onPress={() => navigation.navigate('Language')}
+              onPress={() => router.push('/(auth)/language')}
               style={styles.primaryButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.buttonLabel}
@@ -100,7 +96,7 @@ export default function WelcomeScreen({ navigation }: WelcomeScreenProps) {
             
             <Button
               mode="outlined"
-              onPress={() => navigation.navigate('Login')}
+              onPress={() => router.push('/(auth)/login')}
               style={styles.secondaryButton}
               contentStyle={styles.buttonContent}
               labelStyle={styles.secondaryButtonLabel}

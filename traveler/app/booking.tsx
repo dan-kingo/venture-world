@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Text, Card, Button, IconButton, TextInput, RadioButton } from 'react-native-paper';
+import { Text, Card, Button, IconButton, TextInput } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router, useLocalSearchParams } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useExperienceStore } from '../../store/experienceStore';
-
-interface BookingScreenProps {
-  navigation: any;
-  route: any;
-}
+import { colors, spacing } from '../src/theme/theme';
+import { useExperienceStore } from '../src/store/experienceStore';
 
 interface BookingForm {
   fullName: string;
@@ -21,14 +17,35 @@ interface BookingForm {
   specialRequests: string;
 }
 
-export default function BookingScreen({ navigation, route }: BookingScreenProps) {
-  const { experience, itinerary } = route.params;
+// Mock data - in real app, fetch based on params
+const mockExperience = {
+  id: '1',
+  title: 'Lalibela Rock Churches AR Tour',
+  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+  price: 150,
+  provider: { name: 'Ethiopian Heritage Tours' },
+};
+
+const mockItinerary = {
+  id: '1',
+  title: '3-Day Cultural Trip',
+  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+  price: 450,
+  duration: '3 days',
+  difficulty: 'Easy',
+};
+
+export default function BookingScreen() {
+  const { experience: experienceId, itinerary: itineraryId } = useLocalSearchParams();
   const { bookExperience } = useExperienceStore();
   const [selectedDate, setSelectedDate] = useState('2024-02-15');
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Mock data - in real app, fetch based on IDs
+  const experience = experienceId ? mockExperience : null;
+  const itinerary = itineraryId ? mockItinerary : null;
   const item = experience || itinerary;
   const isItinerary = !!itinerary;
 
@@ -53,7 +70,7 @@ export default function BookingScreen({ navigation, route }: BookingScreenProps)
     '4:00 PM',
   ];
 
-  const totalPrice = item.price * numberOfPeople;
+  const totalPrice = item?.price ? item.price * numberOfPeople : 0;
 
   const onSubmit = async (data: BookingForm) => {
     setIsLoading(true);
@@ -71,7 +88,7 @@ export default function BookingScreen({ navigation, route }: BookingScreenProps)
         [
           {
             text: 'OK',
-            onPress: () => navigation.navigate('Bookings'),
+            onPress: () => router.push('/(tabs)/bookings'),
           },
         ]
       );
@@ -81,6 +98,15 @@ export default function BookingScreen({ navigation, route }: BookingScreenProps)
       setIsLoading(false);
     }
   };
+
+  if (!item) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>Item not found</Text>
+        <Button onPress={() => router.back()}>Go Back</Button>
+      </View>
+    );
+  }
 
   return (
     <LinearGradient
@@ -94,7 +120,7 @@ export default function BookingScreen({ navigation, route }: BookingScreenProps)
             icon="arrow-left"
             iconColor={colors.primary}
             size={24}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             style={styles.backButton}
           />
           <Text style={styles.headerTitle}>Book {isItinerary ? 'Itinerary' : 'Experience'}</Text>
@@ -112,7 +138,7 @@ export default function BookingScreen({ navigation, route }: BookingScreenProps)
                     {item.title}
                   </Text>
                   <Text style={styles.summaryProvider}>
-                    {isItinerary ? `${item.duration} • ${item.difficulty}` : `by ${item.provider.name}`}
+                    {isItinerary ? `${item.duration} • ${item.difficulty}` : `by ${item.provider?.name}`}
                   </Text>
                   <Text style={styles.summaryPrice}>${item.price} per person</Text>
                 </View>
@@ -358,6 +384,17 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  errorText: {
+    color: colors.text,
+    fontSize: 16,
+    marginBottom: spacing.md,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -488,14 +525,6 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: spacing.md,
     backgroundColor: colors.surface,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: 12,
-    fontFamily: 'Poppins-Regular',
-    marginTop: -spacing.sm,
-    marginBottom: spacing.sm,
-    marginLeft: spacing.sm,
   },
   priceCard: {
     backgroundColor: colors.surface,

@@ -4,18 +4,29 @@ import { Text, Card, Button, IconButton, Chip } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router, useLocalSearchParams } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
+import { colors, spacing } from '../../src/theme/theme';
 
 const { width } = Dimensions.get('window');
 
-interface ExperienceDetailScreenProps {
-  navigation: any;
-  route: any;
-}
+// Mock experience data - in real app, fetch based on ID
+const mockExperience = {
+  id: '1',
+  title: 'Lalibela Rock Churches AR Tour',
+  description: 'Experience the ancient rock-hewn churches through augmented reality with historical insights and professional guides.',
+  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+  price: 150,
+  category: 'AR site',
+  provider: { id: '1', name: 'Ethiopian Heritage Tours' },
+  rating: 4.8,
+  duration: '3 hours',
+  location: 'Lalibela',
+};
 
-export default function ExperienceDetailScreen({ navigation, route }: ExperienceDetailScreenProps) {
-  const { experience } = route.params;
+export default function ExperienceDetailScreen() {
+  const { id } = useLocalSearchParams();
+  const experience = mockExperience; // In real app, fetch by ID
 
   const features = [
     { icon: '📱', title: 'AR Experience', description: 'Augmented reality features' },
@@ -61,7 +72,7 @@ export default function ExperienceDetailScreen({ navigation, route }: Experience
               icon="arrow-left"
               iconColor={colors.text}
               size={24}
-              onPress={() => navigation.goBack()}
+              onPress={() => router.back()}
               style={styles.backButton}
             />
             <View style={styles.headerActions}>
@@ -111,7 +122,7 @@ export default function ExperienceDetailScreen({ navigation, route }: Experience
             </View>
             <Button
               mode="contained"
-              onPress={() => navigation.navigate('Booking', { experience })}
+              onPress={() => router.push(`/booking?experience=${experience.id}`)}
               style={styles.bookButton}
               labelStyle={styles.bookButtonLabel}
             >
@@ -214,7 +225,7 @@ export default function ExperienceDetailScreen({ navigation, route }: Experience
                 </Text>
                 <Button
                   mode="contained"
-                  onPress={() => navigation.navigate('Booking', { experience })}
+                  onPress={() => router.push(`/booking?experience=${experience.id}`)}
                   style={styles.bottomBookButton}
                   labelStyle={styles.bottomBookButtonLabel}
                 >

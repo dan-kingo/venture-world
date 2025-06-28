@@ -4,12 +4,9 @@ import { Text, Card, Chip, Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-
-interface BookingsScreenProps {
-  navigation: any;
-}
+import { colors, spacing } from '../../src/theme/theme';
 
 // Mock booking data
 const mockBookings = [
@@ -52,7 +49,7 @@ const statusColors = {
   cancelled: colors.error,
 };
 
-export default function BookingsScreen({ navigation }: BookingsScreenProps) {
+export default function BookingsScreen() {
   const [bookings] = useState(mockBookings);
 
   const getStatusChipStyle = (status: string) => ({
@@ -142,7 +139,7 @@ export default function BookingsScreen({ navigation }: BookingsScreenProps) {
       </Text>
       <Button
         mode="contained"
-        onPress={() => navigation.navigate('Explore')}
+        onPress={() => router.push('/(tabs)/explore')}
         style={styles.exploreButton}
         labelStyle={styles.exploreButtonLabel}
       >

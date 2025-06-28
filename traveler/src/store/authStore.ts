@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { authAPI } from '../services/api';
 
 interface User {
   id: string;
@@ -8,6 +9,7 @@ interface User {
   role: string;
   interests: string[];
   language: string;
+  firebaseUid?: string;
 }
 
 interface AuthState {
@@ -32,7 +34,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      // Mock login - replace with actual API call
+      // For now, use mock data since backend auth might not be fully implemented
+      // Replace this with actual API call when backend is ready
       const mockUser: User = {
         id: '1',
         name: 'John Doe',
@@ -43,6 +46,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       };
       
       await AsyncStorage.setItem('user', JSON.stringify(mockUser));
+      await AsyncStorage.setItem('authToken', 'mock-token');
       set({ user: mockUser, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -53,7 +57,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   register: async (userData: any) => {
     set({ isLoading: true });
     try {
-      // Mock registration - replace with actual API call
+      // For now, use mock data since backend auth might not be fully implemented
+      // Replace this with actual API call when backend is ready
       const newUser: User = {
         id: Date.now().toString(),
         ...userData,
@@ -61,6 +66,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       };
       
       await AsyncStorage.setItem('user', JSON.stringify(newUser));
+      await AsyncStorage.setItem('authToken', 'mock-token');
       set({ user: newUser, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -71,6 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   logout: async () => {
     try {
       await AsyncStorage.removeItem('user');
+      await AsyncStorage.removeItem('authToken');
       set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error('Logout error:', error);

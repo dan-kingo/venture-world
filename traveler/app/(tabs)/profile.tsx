@@ -4,15 +4,12 @@ import { Text, Card, Button, List, Avatar, Divider } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-import { useAuthStore } from '../../store/authStore';
+import { colors, spacing } from '../../src/theme/theme';
+import { useAuthStore } from '../../src/store/authStore';
 
-interface ProfileScreenProps {
-  navigation: any;
-}
-
-export default function ProfileScreen({ navigation }: ProfileScreenProps) {
+export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
 
   const handleLogout = () => {
@@ -41,7 +38,7 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
     {
       title: 'Language Settings',
       icon: 'translate',
-      onPress: () => navigation.navigate('Language'),
+      onPress: () => router.push('/(auth)/language'),
     },
     {
       title: 'Notifications',

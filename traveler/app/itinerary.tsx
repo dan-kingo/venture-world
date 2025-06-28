@@ -4,12 +4,9 @@ import { Text, Card, Button, IconButton, Chip } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated';
+import { router } from 'expo-router';
 
-import { colors, spacing } from '../../theme/theme';
-
-interface ItineraryScreenProps {
-  navigation: any;
-}
+import { colors, spacing } from '../src/theme/theme';
 
 const itineraries = [
   {
@@ -98,7 +95,7 @@ const difficultyColors = {
   Challenging: colors.error,
 };
 
-export default function ItineraryScreen({ navigation }: ItineraryScreenProps) {
+export default function ItineraryScreen() {
   const [selectedItinerary, setSelectedItinerary] = useState<any>(null);
 
   const renderItineraryCard = ({ item, index }: { item: any; index: number }) => (
@@ -241,7 +238,7 @@ export default function ItineraryScreen({ navigation }: ItineraryScreenProps) {
                   </Text>
                   <Button
                     mode="contained"
-                    onPress={() => navigation.navigate('Booking', { itinerary: selectedItinerary })}
+                    onPress={() => router.push(`/booking?itinerary=${selectedItinerary.id}`)}
                     style={styles.bookButton}
                     labelStyle={styles.bookButtonLabel}
                   >
@@ -268,7 +265,7 @@ export default function ItineraryScreen({ navigation }: ItineraryScreenProps) {
             icon="arrow-left"
             iconColor={colors.primary}
             size={24}
-            onPress={() => navigation.goBack()}
+            onPress={() => router.back()}
             style={styles.headerBackButton}
           />
           <Text style={styles.headerTitle}>Smart Itineraries</Text>
