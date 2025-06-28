@@ -77,6 +77,7 @@ const generateVRHTML = (videoId: string, title: string) => `
             border-radius: 10px;
             z-index: 1000;
             text-align: center;
+            transition: opacity 0.3s ease;
         }
         
         #vrControls {
@@ -90,6 +91,7 @@ const generateVRHTML = (videoId: string, title: string) => `
             border-radius: 10px;
             text-align: center;
             z-index: 1000;
+            transition: opacity 0.3s ease;
         }
         
         .control-button {
@@ -101,23 +103,62 @@ const generateVRHTML = (videoId: string, title: string) => `
             border-radius: 20px;
             font-size: 14px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
         
         .control-button:hover {
             background: #333;
         }
+        
+        .control-button:active {
+            background: #555;
+        }
+        
+        #loadingIndicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: #FFD700;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2000;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #FFD700;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <div id="vrContainer">
+        <div id="loadingIndicator">
+            <div class="spinner"></div>
+            <p>Loading VR Experience...</p>
+        </div>
+        
         <div id="vrOverlay">
             <h3>🥽 ${title}</h3>
             <p>Use your device's gyroscope or drag to look around in 360°</p>
+            <p>Tap screen to show/hide controls</p>
         </div>
         
         <iframe
             id="youtube-player"
-            src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&showinfo=0&fs=1&playsinline=1"
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&showinfo=0&fs=1&playsinline=1&enablejsapi=1"
             frameborder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowfullscreen>
@@ -128,11 +169,37 @@ const generateVRHTML = (videoId: string, title: string) => `
             <button class="control-button" onclick="toggleFullscreen()">📺 Fullscreen</button>
             <button class="control-button" onclick="resetView()">🔄 Reset View</button>
             <button class="control-button" onclick="toggleQuality()">⚙️ Quality</button>
+            <button class="control-button" onclick="togglePlayback()">⏯️ Play/Pause</button>
         </div>
     </div>
     
     <script>
         let isFullscreen = false;
+        let player;
+        let isPlaying = true;
+        
+        // YouTube API ready
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+        
+        function onPlayerReady(event) {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            console.log('YouTube player ready');
+        }
+        
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPlaying = true;
+            } else if (event.data == YT.PlayerState.PAUSED) {
+                isPlaying = false;
+            }
+        }
         
         function toggleFullscreen() {
             const container = document.getElementById('vrContainer');
@@ -159,31 +226,77 @@ const generateVRHTML = (videoId: string, title: string) => `
         }
         
         function resetView() {
-            // Reset the YouTube player view (this would require YouTube API)
-            console.log('Reset view');
+            // For YouTube 360° videos, this would require YouTube API
+            console.log('Reset view - feature requires YouTube API integration');
+            if (player && player.seekTo) {
+                player.seekTo(0);
+            }
         }
         
         function toggleQuality() {
-            // Toggle video quality (this would require YouTube API)
-            console.log('Toggle quality');
+            console.log('Toggle quality - feature requires YouTube API integration');
+            // This would require YouTube API to change quality
+            alert('Quality settings available in fullscreen mode');
+        }
+        
+        function togglePlayback() {
+            if (player) {
+                if (isPlaying) {
+                    player.pauseVideo();
+                } else {
+                    player.playVideo();
+                }
+            }
         }
         
         // Hide controls after 5 seconds
         setTimeout(() => {
-            document.getElementById('vrOverlay').style.opacity = '0.5';
-            document.getElementById('vrControls').style.opacity = '0.5';
+            document.getElementById('vrOverlay').style.opacity = '0.3';
+            document.getElementById('vrControls').style.opacity = '0.3';
         }, 5000);
         
         // Show controls on touch/click
+        let hideTimeout;
         document.addEventListener('click', () => {
-            document.getElementById('vrOverlay').style.opacity = '1';
-            document.getElementById('vrControls').style.opacity = '1';
+            const overlay = document.getElementById('vrOverlay');
+            const controls = document.getElementById('vrControls');
             
-            setTimeout(() => {
-                document.getElementById('vrOverlay').style.opacity = '0.5';
-                document.getElementById('vrControls').style.opacity = '0.5';
+            overlay.style.opacity = '1';
+            controls.style.opacity = '1';
+            
+            clearTimeout(hideTimeout);
+            hideTimeout = setTimeout(() => {
+                overlay.style.opacity = '0.3';
+                controls.style.opacity = '0.3';
             }, 3000);
         });
+        
+        // Handle fullscreen changes
+        document.addEventListener('fullscreenchange', () => {
+            isFullscreen = !!document.fullscreenElement;
+        });
+        
+        document.addEventListener('webkitfullscreenchange', () => {
+            isFullscreen = !!document.webkitFullscreenElement;
+        });
+        
+        document.addEventListener('mozfullscreenchange', () => {
+            isFullscreen = !!document.mozFullScreenElement;
+        });
+        
+        // Load YouTube API
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        
+        // Remove loading indicator after 5 seconds as fallback
+        setTimeout(() => {
+            const loading = document.getElementById('loadingIndicator');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        }, 5000);
     </script>
 </body>
 </html>
@@ -239,6 +352,9 @@ export default function VRScreen() {
             domStorageEnabled
             allowsInlineMediaPlayback
             mixedContentMode="compatibility"
+            onMessage={(event) => {
+              console.log('VR WebView message:', event.nativeEvent.data);
+            }}
           />
 
           {/* VR Controls */}
@@ -317,7 +433,7 @@ export default function VRScreen() {
               <Text style={styles.introIcon}>🥽</Text>
               <Text style={styles.introTitle}>Virtual Reality Tours</Text>
               <Text style={styles.introDescription}>
-                Experience Ethiopia's wonders from anywhere in the world with immersive 360° videos
+                Experience Ethiopia's wonders from anywhere in the world with immersive 360° YouTube videos
               </Text>
             </LinearGradient>
           </Card>
@@ -353,7 +469,7 @@ export default function VRScreen() {
                         🕐 {experience.duration}
                       </Text>
                       <View style={styles.vrBadge}>
-                        <Text style={styles.vrBadgeText}>360° VR</Text>
+                        <Text style={styles.vrBadgeText}>360° YouTube</Text>
                       </View>
                     </View>
                   </View>
@@ -381,7 +497,8 @@ export default function VRScreen() {
                 • Use headphones for immersive audio{'\n'}
                 • Rotate your device for 360° viewing{'\n'}
                 • Ensure stable internet connection{'\n'}
-                • Use VR headset if available
+                • Use VR headset if available{'\n'}
+                • Tap screen to show/hide controls
               </Text>
             </Card.Content>
           </Card>

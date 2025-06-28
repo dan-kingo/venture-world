@@ -17,14 +17,15 @@ const AR_HTML = `
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebAR Experience</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background: #000;
             color: #fff;
+            overflow: hidden;
         }
         
         #arContainer {
@@ -42,6 +43,7 @@ const AR_HTML = `
             padding: 15px;
             border-radius: 10px;
             z-index: 1000;
+            text-align: center;
         }
         
         #instructions {
@@ -60,12 +62,17 @@ const AR_HTML = `
         .hidden {
             display: none;
         }
+        
+        a-scene {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
     <div id="arContainer">
         <div id="info">
-            <h3>🏛️ Lalibela Rock Churches</h3>
+            <h3>🏛️ Lalibela Rock Churches AR</h3>
             <p>Point your camera at any surface to see the AR experience</p>
         </div>
         
@@ -82,36 +89,85 @@ const AR_HTML = `
             
             <!-- Assets -->
             <a-assets>
-                <a-asset-item id="church" src="data:text/plain;base64,"></a-asset-item>
+                <a-mixin id="church-material" material="color: #8B4513; metalness: 0.2; roughness: 0.8;"></a-mixin>
+                <a-mixin id="gold-material" material="color: #FFD700; metalness: 0.8; roughness: 0.2;"></a-mixin>
             </a-assets>
             
             <!-- AR Marker -->
-            <a-marker preset="hiro" raycaster="objects: .clickable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;">
-                <!-- 3D Church Model -->
+            <a-marker preset="hiro" raycaster="objects: .clickable" emitevents="true" cursor="fuse: false; rayOrigin: mouse;" markerhandler>
+                <!-- Main Church Structure -->
                 <a-box 
                     position="0 0.5 0" 
                     rotation="0 45 0" 
-                    color="#8B4513"
-                    animation="property: rotation; to: 0 405 0; loop: true; dur: 10000">
+                    scale="1 1 1.5"
+                    mixin="church-material"
+                    animation="property: rotation; to: 0 405 0; loop: true; dur: 20000">
+                </a-box>
+                
+                <!-- Church Tower -->
+                <a-cylinder
+                    position="0 1.5 0"
+                    radius="0.3"
+                    height="1"
+                    mixin="church-material">
+                </a-cylinder>
+                
+                <!-- Cross on top -->
+                <a-box
+                    position="0 2.2 0"
+                    scale="0.1 0.3 0.1"
+                    mixin="gold-material">
+                </a-box>
+                <a-box
+                    position="0 2.1 0"
+                    scale="0.3 0.1 0.1"
+                    mixin="gold-material">
                 </a-box>
                 
                 <!-- Information Text -->
                 <a-text 
-                    value="Lalibela Rock Churches\\n12th Century UNESCO Site"
-                    position="0 2 0"
+                    value="Lalibela Rock Churches\\n12th Century UNESCO Site\\nCarved from Volcanic Rock"
+                    position="0 3 0"
                     align="center"
                     color="#FFD700"
-                    scale="2 2 2">
+                    scale="1.5 1.5 1.5"
+                    animation="property: position; to: 0 3.5 0; dir: alternate; loop: true; dur: 3000">
                 </a-text>
                 
                 <!-- Historical Facts -->
                 <a-text 
-                    value="Built during King Lalibela's reign\\nCarved from volcanic rock\\nRepresents New Jerusalem"
+                    value="Built during King Lalibela's reign\\nRepresents New Jerusalem\\nStill active place of worship"
                     position="0 -1 0"
                     align="center"
                     color="#FFFFFF"
                     scale="1 1 1">
                 </a-text>
+                
+                <!-- Decorative elements -->
+                <a-sphere
+                    position="1 0.5 1"
+                    radius="0.1"
+                    mixin="gold-material"
+                    animation="property: rotation; to: 360 360 360; loop: true; dur: 5000">
+                </a-sphere>
+                <a-sphere
+                    position="-1 0.5 1"
+                    radius="0.1"
+                    mixin="gold-material"
+                    animation="property: rotation; to: -360 -360 -360; loop: true; dur: 5000">
+                </a-sphere>
+                <a-sphere
+                    position="1 0.5 -1"
+                    radius="0.1"
+                    mixin="gold-material"
+                    animation="property: rotation; to: 360 -360 360; loop: true; dur: 5000">
+                </a-sphere>
+                <a-sphere
+                    position="-1 0.5 -1"
+                    radius="0.1"
+                    mixin="gold-material"
+                    animation="property: rotation; to: -360 360 -360; loop: true; dur: 5000">
+                </a-sphere>
             </a-marker>
             
             <!-- Camera -->
@@ -128,29 +184,48 @@ const AR_HTML = `
                 marker.addEventListener('markerFound', function() {
                     console.log('Marker found');
                     document.getElementById('instructions').innerHTML = 
-                        '<p>✅ AR Site Detected! Explore the 3D model</p>';
+                        '<p>✅ AR Site Detected! Explore the 3D model of Lalibela</p>';
+                    document.getElementById('instructions').style.background = 'rgba(76, 175, 80, 0.9)';
+                    document.getElementById('instructions').style.color = '#fff';
                 });
                 
                 marker.addEventListener('markerLost', function() {
                     console.log('Marker lost');
                     document.getElementById('instructions').innerHTML = 
                         '<p>📱 Move your device slowly to detect surfaces</p>';
+                    document.getElementById('instructions').style.background = 'rgba(255, 215, 0, 0.9)';
+                    document.getElementById('instructions').style.color = '#000';
                 });
             }
         });
         
-        // Add marker handler to all markers
-        document.querySelectorAll('a-marker').forEach(marker => {
-            marker.setAttribute('markerhandler', '');
-        });
-        
         // Simulate detection after 3 seconds if no marker found
         setTimeout(() => {
-            if (!document.querySelector('a-marker[visible="true"]')) {
-                document.getElementById('instructions').innerHTML = 
-                    '<p>🎯 Try pointing at a flat surface or printed QR code</p>';
+            const instructions = document.getElementById('instructions');
+            if (instructions.innerHTML.includes('Move your device')) {
+                instructions.innerHTML = '<p>🎯 Try pointing at a flat surface or use the Hiro marker</p>';
             }
         }, 3000);
+        
+        // Add click interaction
+        document.addEventListener('click', function() {
+            const info = document.getElementById('info');
+            const instructions = document.getElementById('instructions');
+            
+            if (info.style.opacity === '0.3') {
+                info.style.opacity = '1';
+                instructions.style.opacity = '1';
+            } else {
+                info.style.opacity = '0.3';
+                instructions.style.opacity = '0.3';
+            }
+        });
+        
+        // Auto-hide UI after 5 seconds
+        setTimeout(() => {
+            document.getElementById('info').style.opacity = '0.3';
+            document.getElementById('instructions').style.opacity = '0.3';
+        }, 5000);
     </script>
 </body>
 </html>
@@ -270,7 +345,7 @@ export default function ARScreen() {
               <Text style={styles.introIcon}>📱</Text>
               <Text style={styles.introTitle}>Augmented Reality Tours</Text>
               <Text style={styles.introDescription}>
-                Experience Ethiopian heritage sites through cutting-edge AR technology
+                Experience Ethiopian heritage sites through cutting-edge AR technology powered by WebAR.js
               </Text>
             </Card.Content>
           </Card>
@@ -286,7 +361,7 @@ export default function ARScreen() {
               <View style={styles.featureDetails}>
                 <Text style={styles.featureTitle}>3D Historical Models</Text>
                 <Text style={styles.featureDescription}>
-                  View detailed 3D reconstructions of ancient sites
+                  View detailed 3D reconstructions of ancient sites using WebAR.js
                 </Text>
               </View>
             </Card.Content>
@@ -298,7 +373,7 @@ export default function ARScreen() {
               <View style={styles.featureDetails}>
                 <Text style={styles.featureTitle}>Interactive Information</Text>
                 <Text style={styles.featureDescription}>
-                  Access historical facts and cultural insights
+                  Access historical facts and cultural insights in real-time
                 </Text>
               </View>
             </Card.Content>
@@ -306,11 +381,11 @@ export default function ARScreen() {
 
           <Card style={styles.featureCard}>
             <Card.Content style={styles.featureContent}>
-              <Text style={styles.featureIcon}>🎧</Text>
+              <Text style={styles.featureIcon}>🎯</Text>
               <View style={styles.featureDetails}>
-                <Text style={styles.featureTitle}>Audio Narration</Text>
+                <Text style={styles.featureTitle}>Marker-based Tracking</Text>
                 <Text style={styles.featureDescription}>
-                  Listen to expert commentary and stories
+                  Point at surfaces or use Hiro markers for AR activation
                 </Text>
               </View>
             </Card.Content>
@@ -331,7 +406,7 @@ export default function ARScreen() {
           </Button>
           
           <Text style={styles.startNote}>
-            Make sure you have good lighting and point your camera at flat surfaces
+            Make sure you have good lighting and camera permissions enabled. Point your camera at flat surfaces or use a Hiro marker for best results.
           </Text>
         </Animated.View>
       </SafeAreaView>

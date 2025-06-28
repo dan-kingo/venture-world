@@ -22,7 +22,7 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
       image,
       price,
       category,
-      provider: req.user?.id,
+      provider: req.user?.uid,
       status: "pending",
     });
 
@@ -57,7 +57,7 @@ export const getApprovedExperiences = async (req: Request, res: Response) => {
  */
 export const getMyExperiences = async (req: AuthRequest, res: Response) => {
   try {
-    const experiences = await Experience.find({ provider: req.user?.id });
+    const experiences = await Experience.find({ provider: req.user?.uid });
 
     res.json(experiences);
   } catch (err) {

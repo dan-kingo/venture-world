@@ -28,7 +28,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
 
     const booking = new Booking({
       experience: experienceId,
-      traveler: req.user?.id,
+      traveler: req.user?.uid,
       status: "pending",
     });
 
@@ -59,7 +59,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
  */
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   try {
-    const bookings = await Booking.find({ traveler: req.user?.id })
+    const bookings = await Booking.find({ traveler: req.user?.uid })
       .populate("experience", "title category")
       .sort({ createdAt: -1 });
 

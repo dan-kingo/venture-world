@@ -9,8 +9,7 @@ interface User {
   role: string;
   interests: string[];
   language?: string;
-  phone?: string;
-  status?: string;
+  firebaseUid?: string;
 }
 
 interface AuthState {
@@ -22,9 +21,6 @@ interface AuthState {
   register: (userData: any) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (userData: Partial<User>) => Promise<void>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
-  forgotPassword: (email: string) => Promise<void>;
-  resetPassword: (token: string, newPassword: string) => Promise<void>;
   setLanguage: (language: string) => Promise<void>;
   initializeAuth: () => Promise<void>;
 }
@@ -69,41 +65,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   updateProfile: async (userData: Partial<User>) => {
-    try {
-      const response = await authAPI.updateProfile(userData);
-      if (response.user) {
-        set({ user: response.user });
+    const currentUser = get().user;
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...userData };
+      try {
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+        set({ user: updatedUser });
+      } catch (error) {
+        console.error('Update profile error:', error);
       }
-    } catch (error) {
-      console.error('Update profile error:', error);
-      throw error;
-    }
-  },
-
-  changePassword: async (currentPassword: string, newPassword: string) => {
-    try {
-      await authAPI.changePassword(currentPassword, newPassword);
-    } catch (error) {
-      console.error('Change password error:', error);
-      throw error;
-    }
-  },
-
-  forgotPassword: async (email: string) => {
-    try {
-      await authAPI.forgotPassword(email);
-    } catch (error) {
-      console.error('Forgot password error:', error);
-      throw error;
-    }
-  },
-
-  resetPassword: async (token: string, newPassword: string) => {
-    try {
-      await authAPI.resetPassword(token, newPassword);
-    } catch (error) {
-      console.error('Reset password error:', error);
-      throw error;
     }
   },
 
@@ -137,17 +107,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       if (storedUser) {
         const user = JSON.parse(storedUser);
         set({ user, isAuthenticated: true });
-        
-        // Try to refresh user data from server
-        try {
-          const refreshedUser = await authAPI.getProfile();
-          if (refreshedUser) {
-            set({ user: refreshedUser });
-          }
-        } catch (error) {
-          console.log('Could not refresh user data, using stored data');
-        }
       }
+
+      // Listen for auth state changes
+      authAPI.onAuthStateChanged((firebaseUser) => {
+        if (!firebaseUser && get().isAuthenticated) {
+          // User signed out from Firebase, update local state
+          set({ user: null, isAuthenticated: false });
+        }
+      });
     } catch (error) {
       console.error('Auth initialization error:', error);
     }

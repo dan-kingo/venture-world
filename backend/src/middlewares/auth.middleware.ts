@@ -1,10 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import admin from "firebase-admin";
 import User from "../models/user.model";
+
+if (admin.apps.length === 0) {
+  admin.initializeApp({
+    credential: admin.credential.applicationDefault(), 
+  });
+}
 
 export interface AuthRequest extends Request {
   user?: {
-    id: string;
+    uid: string;
     role: string;
   };
 }
@@ -20,9 +26,9 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
-    
-    const user = await User.findById(decoded.id);
+    const decodedToken = await admin.auth().verifyIdToken(token);
+
+    const user = await User.findOne({ firebaseUid: decodedToken.uid });
 
     if (!user) {
       res.status(401).json({ message: "User not found" });
@@ -30,7 +36,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     req.user = {
-      id: String(user._id),
+      uid: user.firebaseUid, 
       role: user.role,
     };
 
