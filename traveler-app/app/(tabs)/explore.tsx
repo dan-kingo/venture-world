@@ -145,7 +145,7 @@ export default function ExploreScreen() {
           keyExtractor={(item) => item.id}
           numColumns={2}
           columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.experiencesList}
+          contentContainerStyle={[styles.experiencesList, { paddingBottom: 100 }]}
           showsVerticalScrollIndicator={false}
           refreshing={isLoading}
           onRefresh={fetchExperiences}
@@ -222,7 +222,6 @@ const styles = StyleSheet.create({
   },
   experiencesList: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
   },
   row: {
     justifyContent: 'space-between',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { Text, Card, Chip, Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,8 +7,9 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { router } from 'expo-router';
 
 import { colors, spacing } from '../../src/theme/theme';
+import { bookingsAPI } from '../../src/services/api';
 
-// Mock booking data
+// Mock booking data for when backend is not available
 const mockBookings = [
   {
     id: '1',
@@ -50,7 +51,25 @@ const statusColors = {
 };
 
 export default function BookingsScreen() {
-  const [bookings] = useState(mockBookings);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    setIsLoading(true);
+    try {
+      const data = await bookingsAPI.getMine();
+      setBookings(data.length > 0 ? data : mockBookings);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      setBookings(mockBookings);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getStatusChipStyle = (status: string) => ({
     backgroundColor: statusColors[status as keyof typeof statusColors] + '20',
@@ -166,8 +185,10 @@ export default function BookingsScreen() {
             data={bookings}
             renderItem={renderBooking}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.bookingsList}
+            contentContainerStyle={[styles.bookingsList, { paddingBottom: 100 }]}
             showsVerticalScrollIndicator={false}
+            refreshing={isLoading}
+            onRefresh={fetchBookings}
           />
         ) : (
           renderEmptyState()
@@ -202,7 +223,6 @@ const styles = StyleSheet.create({
   },
   bookingsList: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
   },
   bookingCard: {
     backgroundColor: colors.surface,
