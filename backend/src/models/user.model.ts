@@ -12,7 +12,9 @@ const userSchema = new Schema<IUser>(
     interests: [{ type: String }],
     status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
      firebaseUid: { type: String, required: true, unique: true },
+     expoPushToken: { type: String, default: null }
   },
+
   { timestamps: true }
 );
 

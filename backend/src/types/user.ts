@@ -9,4 +9,5 @@ export interface IUser extends Document {
   interests?: string[];
   status: "pending" | "approved" | "rejected";
   firebaseUid: string;
+  expoPushToken?: string;
 }
