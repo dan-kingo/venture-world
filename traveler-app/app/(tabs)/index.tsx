@@ -56,7 +56,11 @@ export default function HomeScreen() {
       style={styles.container}
     >
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
           {/* Header */}
           <Animated.View entering={FadeInDown.delay(200)} style={styles.header}>
             <View style={styles.headerContent}>
@@ -189,6 +193,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 100, // Add padding to prevent content being hidden behind tab bar
   },
   header: {
     paddingHorizontal: spacing.lg,

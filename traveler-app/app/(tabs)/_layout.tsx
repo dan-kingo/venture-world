@@ -2,6 +2,7 @@ import { Redirect, Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { colors } from '../../src/theme/theme';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
   const { isAuthenticated } = useAuthStore();
@@ -36,13 +37,18 @@ export default function TabLayout() {
           backgroundColor: colors.surface,
           borderTopColor: colors.surfaceVariant,
           borderTopWidth: 1,
-          paddingBottom: 8,
+          paddingBottom: Platform.OS === 'ios' ? 20 : 8,
           paddingTop: 8,
-          height: 70,
+          height: Platform.OS === 'ios' ? 90 : 70,
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
         },
         tabBarLabelStyle: {
           fontFamily: 'Poppins-Regular',
           fontSize: 12,
+          marginBottom: Platform.OS === 'ios' ? 0 : 4,
         },
         headerShown: false,
       })}

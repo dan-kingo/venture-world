@@ -6,6 +6,7 @@ import experienceRoutes from "./routes/experience.routes";
 import adminRoutes from "./routes/admin.routes";
 import bookingRoutes from "./routes/booking.routes";
 import itineraryRoutes from "./routes/itinerary.routes";
+import healthRoutes from "./routes/health.routes";
 
 dotenv.config();
 
@@ -14,7 +15,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api",authRoutes);
+// Health check route (no auth required)
+app.use("/api", healthRoutes);
+
+// Other routes
+app.use("/api", authRoutes);
 app.use('/api', experienceRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api', bookingRoutes);
