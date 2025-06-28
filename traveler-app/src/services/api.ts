@@ -1,5 +1,23 @@
+// services/api.ts
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBbQ5l0PueNEGeWKn9jvf6DrYlX60atoJk",
+  authDomain: "venture-world-1123.firebaseapp.com",
+  projectId: "venture-world-1123",
+  storageBucket: "venture-world-1123.firebasestorage.app",
+  messagingSenderId: "483733490793",
+  appId: "1:483733490793:web:67a111b328a44f7650e6f8",
+  measurementId: "G-L256W2HEEC"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
 
 // Backend URL - update this to match your backend server
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -43,7 +61,6 @@ api.interceptors.response.use(
       } catch (storageError) {
         console.error('Error clearing secure storage:', storageError);
       }
-      // You might want to trigger a logout action here
     }
     return Promise.reject(error);
   }
@@ -52,27 +69,63 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   login: async (email: string, password: string) => {
-    const response = await api.post('/auth/login', { email, password });
-    // Automatically save token to SecureStore on login
-    if (response.data.token) {
-      await SecureStore.setItemAsync('authToken', response.data.token);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      
+      // Save token to SecureStore
+      await SecureStore.setItemAsync('authToken', token);
+      
+      // Get user data from your backend (optional)
+      const response = await api.get('/me');
+      const userData = response.data;
+      
+      if (userData) {
+        await SecureStore.setItemAsync('user', JSON.stringify(userData));
+      }
+      
+      return userData;
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
-    return response.data;
   },
 
   register: async (userData: any) => {
-    const response = await api.post('/auth/register', userData);
-    // Save token if returned during registration
-    if (response.data.token) {
-      await SecureStore.setItemAsync('authToken', response.data.token);
+    try {
+      const { email, password, ...rest } = userData;
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      
+      // Save token to SecureStore
+      await SecureStore.setItemAsync('authToken', token);
+      
+      // Create user profile in your backend (optional)
+      const response = await api.post('/auth/register', {
+        firebaseUid: userCredential.user.uid,
+        email,
+        ...rest
+      });
+      
+      if (response.data) {
+        await SecureStore.setItemAsync('user', JSON.stringify(response.data));
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
     }
-    return response.data;
   },
 
   logout: async () => {
-    // Clear secure storage on logout
-    await SecureStore.deleteItemAsync('authToken');
-    await SecureStore.deleteItemAsync('user');
+    try {
+      await auth.signOut();
+      await SecureStore.deleteItemAsync('authToken');
+      await SecureStore.deleteItemAsync('user');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   },
 
   setupProfile: async (profileData: any) => {
@@ -82,7 +135,6 @@ export const authAPI = {
 
   getProfile: async () => {
     const response = await api.get('/me');
-    // Optionally store user data securely
     if (response.data) {
       await SecureStore.setItemAsync('user', JSON.stringify(response.data));
     }
@@ -95,7 +147,6 @@ export const authAPI = {
   },
 };
 
-// Experiences API
 export const experiencesAPI = {
   getAll: async () => {
     const response = await api.get('/experiences');
