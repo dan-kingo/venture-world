@@ -5,6 +5,7 @@ import authRoutes from "./routes/auth.routes";
 import experienceRoutes from "./routes/experience.routes";
 import adminRoutes from "./routes/admin.routes";
 import bookingRoutes from "./routes/booking.routes";
+import itineraryRoutes from "./routes/itinerary.routes";
 
 dotenv.config();
 
@@ -17,5 +18,6 @@ app.use("/api",authRoutes);
 app.use('/api', experienceRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api', bookingRoutes);
+app.use("/api", itineraryRoutes);
 
 export default app;
