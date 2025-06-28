@@ -154,7 +154,7 @@ export default function LoginScreen() {
               <Text style={styles.registerText}>Don't have an account? </Text>
               <Button
                 mode="text"
-                onPress={() => router.push('/(auth)/register')}
+                onPress={() => router.push('/register')}
                 labelStyle={styles.registerButtonLabel}
               >
                 Sign Up

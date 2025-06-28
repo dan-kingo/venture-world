@@ -2,8 +2,8 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-
+import  { signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence} from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 // Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBbQ5l0PueNEGeWKn9jvf6DrYlX60atoJk",
@@ -17,8 +17,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
-const auth = getAuth(firebaseApp);
-
+const auth = initializeAuth(firebaseApp, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 // Backend URL - update this to match your backend server
 const API_BASE_URL = 'http://localhost:3000/api';
 

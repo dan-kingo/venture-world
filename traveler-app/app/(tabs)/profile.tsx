@@ -38,7 +38,7 @@ export default function ProfileScreen() {
     {
       title: 'Language Settings',
       icon: 'translate',
-      onPress: () => router.push('/(auth)/language'),
+      onPress: () => router.push('/language'),
     },
     {
       title: 'Notifications',

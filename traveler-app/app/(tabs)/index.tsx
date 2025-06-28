@@ -20,7 +20,13 @@ export default function HomeScreen() {
     fetchFeaturedExperiences();
   }, []);
 
-  const quickActions = [
+  const quickActions: {
+    title: string;
+    icon: string;
+    description: string;
+    onPress: () => void;
+    gradient: [string, string];
+  }[] = [
     {
       title: 'AR Experience',
       icon: '📱',
