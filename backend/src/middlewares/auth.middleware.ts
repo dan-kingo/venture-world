@@ -30,7 +30,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     req.user = {
-      id: user._id.toString(),
+      id: String(user._id),
       role: user.role,
     };
 

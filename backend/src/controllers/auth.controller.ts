@@ -40,11 +40,11 @@ export const register = async (req: Request, res: Response) => {
     await user.save();
 
     // Generate JWT token
-    const token = generateToken(user._id.toString());
+    const token = generateToken(String(user._id));
 
     // Remove password from response
     const userResponse = {
-      id: user._id.toString(),
+      id: String(user._id),
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -93,11 +93,11 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Generate JWT token
-    const token = generateToken(user._id.toString());
+    const token = generateToken(String(user._id));
 
     // Remove password from response
     const userResponse = {
-      id: user._id.toString(),
+      id: String(user._id),
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -132,7 +132,7 @@ export const getMyProfile = async (req: AuthRequest, res: Response) => {
     }
 
     const userResponse = {
-      id: user._id.toString(),
+      id: String(user._id),
       name: user.name,
       email: user.email,
       phone: user.phone,
@@ -173,7 +173,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     // Remove password from response
     const userResponse = {
-      id: user._id.toString(),
+      id: String(user._id),
       name: user.name,
       email: user.email,
       phone: user.phone,
