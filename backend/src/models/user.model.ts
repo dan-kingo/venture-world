@@ -1,14 +1,7 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model } from "mongoose";
+import { IUser } from "../types/user";
 
-export interface IUser extends Document {
-  name: string;
-  email?: string;
-  phone?: string;
-  role: "traveler" | "provider" | "admin";
-  interests?: string[];
-  status: "pending" | "approved" | "rejected";
-  firebaseUid: string;
-}
+
 
 const userSchema = new Schema<IUser>(
   {

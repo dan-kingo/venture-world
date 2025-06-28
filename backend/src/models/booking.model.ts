@@ -1,10 +1,7 @@
-import mongoose, { Schema, model, Document } from "mongoose";
+import { Schema, model } from "mongoose";
+import { IBooking } from "../types/booking";
 
-export interface IBooking extends Document {
-  experience: mongoose.Types.ObjectId; 
-  traveler: mongoose.Types.ObjectId;
-  status: "pending" | "confirmed";
-}
+
 
 const bookingSchema = new Schema<IBooking>(
   {

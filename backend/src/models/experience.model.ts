@@ -1,14 +1,7 @@
-import mongoose, { Schema, model, Document } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
+import { IExperience } from "../types/experience";
 
-export interface IExperience extends Document {
-  title: string;
-  description: string;
-  image: string;
-  price?: number;
-  category: "AR site" | "eco-tour" | "heritage";
-  provider: mongoose.Types.ObjectId; 
-  status: "pending" | "approved" | "rejected";
-}
+
 
 const experienceSchema = new Schema<IExperience>(
   {
