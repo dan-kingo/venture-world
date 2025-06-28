@@ -1,4 +1,3 @@
-// stores/authStore.ts
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { authAPI } from '../services/api';
@@ -9,7 +8,7 @@ interface User {
   email: string;
   role: string;
   interests: string[];
-  language: string;
+  language?: string;
   firebaseUid?: string;
 }
 
@@ -60,6 +59,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ user: null, isAuthenticated: false });
     } catch (error) {
       console.error('Logout error:', error);
+      // Force logout even if there's an error
+      set({ user: null, isAuthenticated: false });
     }
   },
 
@@ -67,20 +68,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const currentUser = get().user;
     if (currentUser) {
       const updatedUser = { ...currentUser, ...userData };
-      await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
-      set({ user: updatedUser });
+      try {
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+        set({ user: updatedUser });
+      } catch (error) {
+        console.error('Update profile error:', error);
+      }
     }
   },
 
   setLanguage: async (language: string) => {
-    await SecureStore.setItemAsync('language', language);
-    set({ language });
-    
-    const currentUser = get().user;
-    if (currentUser) {
-      const updatedUser = { ...currentUser, language };
-      await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
-      set({ user: updatedUser });
+    try {
+      await SecureStore.setItemAsync('language', language);
+      set({ language });
+      
+      const currentUser = get().user;
+      if (currentUser) {
+        const updatedUser = { ...currentUser, language };
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+        set({ user: updatedUser });
+      }
+    } catch (error) {
+      console.error('Set language error:', error);
     }
   },
 
@@ -99,6 +108,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         const user = JSON.parse(storedUser);
         set({ user, isAuthenticated: true });
       }
+
+      // Listen for auth state changes
+      authAPI.onAuthStateChanged((firebaseUser) => {
+        if (!firebaseUser && get().isAuthenticated) {
+          // User signed out from Firebase, update local state
+          set({ user: null, isAuthenticated: false });
+        }
+      });
     } catch (error) {
       console.error('Auth initialization error:', error);
     }

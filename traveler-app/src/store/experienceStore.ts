@@ -21,12 +21,13 @@ interface ExperienceState {
   experiences: Experience[];
   featuredExperiences: Experience[];
   isLoading: boolean;
+  error: string | null;
   fetchExperiences: () => Promise<void>;
   fetchFeaturedExperiences: () => Promise<void>;
   bookExperience: (experienceId: string) => Promise<void>;
 }
 
-// Mock data - will be replaced by API calls
+// Mock data - will be replaced by API calls when backend is available
 const mockExperiences: Experience[] = [
   {
     id: '1',
@@ -88,17 +89,30 @@ const mockExperiences: Experience[] = [
     duration: '45 minutes',
     location: 'Simien Mountains',
   },
+  {
+    id: '6',
+    title: 'Harar Old City Heritage Tour',
+    description: 'Explore the ancient walled city of Harar with its unique architecture.',
+    image: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg',
+    price: 120,
+    category: 'heritage',
+    provider: { id: '6', name: 'Harar Cultural Tours' },
+    rating: 4.4,
+    duration: '4 hours',
+    location: 'Harar',
+  },
 ];
 
-export const useExperienceStore = create<ExperienceState>((set) => ({
+export const useExperienceStore = create<ExperienceState>((set, get) => ({
   experiences: [],
   featuredExperiences: [],
   isLoading: false,
+  error: null,
 
   fetchExperiences: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
-      // Try to fetch from API, fallback to mock data
+      // Try to fetch from API first
       try {
         const experiences = await experiencesAPI.getAll();
         set({ experiences, isLoading: false });
@@ -109,46 +123,55 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
         set({ experiences: mockExperiences, isLoading: false });
       }
     } catch (error) {
-      set({ isLoading: false });
       console.error('Error fetching experiences:', error);
+      set({ 
+        error: 'Failed to load experiences', 
+        isLoading: false,
+        experiences: mockExperiences // Fallback to mock data
+      });
     }
   },
 
   fetchFeaturedExperiences: async () => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     try {
-      // Try to fetch from API, fallback to mock data
+      // Try to fetch from API first
       try {
         const experiences = await experiencesAPI.getAll();
         const featured = experiences.slice(0, 3);
         set({ featuredExperiences: featured, isLoading: false });
       } catch (apiError) {
-        console.log('API not available, using mock data');
+        console.log('API not available, using mock data for featured');
         // Simulate API delay
         await new Promise(resolve => setTimeout(resolve, 800));
         const featured = mockExperiences.slice(0, 3);
         set({ featuredExperiences: featured, isLoading: false });
       }
     } catch (error) {
-      set({ isLoading: false });
       console.error('Error fetching featured experiences:', error);
+      set({ 
+        error: 'Failed to load featured experiences', 
+        isLoading: false,
+        featuredExperiences: mockExperiences.slice(0, 3) // Fallback to mock data
+      });
     }
   },
 
   bookExperience: async (experienceId: string) => {
     try {
-      // Try to book via API, fallback to mock
+      // Try to book via API first
       try {
         await bookingsAPI.create(experienceId);
+        console.log('Experience booked via API:', experienceId);
       } catch (apiError) {
         console.log('API not available, simulating booking');
         // Simulate booking delay
         await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Experience booked (simulated):', experienceId);
       }
-      console.log('Experience booked:', experienceId);
     } catch (error) {
       console.error('Error booking experience:', error);
-      throw error;
+      throw new Error('Failed to book experience. Please try again.');
     }
   },
 }));

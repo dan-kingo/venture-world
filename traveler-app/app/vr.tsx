@@ -17,7 +17,7 @@ const vrExperiences = [
     title: 'Lalibela Rock Churches',
     description: 'Explore the magnificent rock-hewn churches in 360°',
     thumbnail: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&vr=1',
+    videoId: 'MJjjhrfYWqM', // Example 360° video ID
     duration: '8 min',
   },
   {
@@ -25,7 +25,7 @@ const vrExperiences = [
     title: 'Simien Mountains',
     description: 'Breathtaking views of Ethiopia\'s highest peaks',
     thumbnail: 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&vr=1',
+    videoId: 'ChOhcHD8fBA', // Example 360° video ID
     duration: '12 min',
   },
   {
@@ -33,10 +33,161 @@ const vrExperiences = [
     title: 'Danakil Depression',
     description: 'Journey to one of the hottest places on Earth',
     thumbnail: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&vr=1',
+    videoId: 'Uvufun6xer8', // Example 360° video ID
     duration: '15 min',
   },
 ];
+
+const generateVRHTML = (videoId: string, title: string) => `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR Experience - ${title}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        #vrContainer {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #youtube-player {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        #vrOverlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1000;
+            text-align: center;
+        }
+        
+        #vrControls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(255, 215, 0, 0.9);
+            color: #000;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+        
+        .control-button {
+            background: #000;
+            color: #FFD700;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .control-button:hover {
+            background: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="vrContainer">
+        <div id="vrOverlay">
+            <h3>🥽 ${title}</h3>
+            <p>Use your device's gyroscope or drag to look around in 360°</p>
+        </div>
+        
+        <iframe
+            id="youtube-player"
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&showinfo=0&fs=1&playsinline=1"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+        </iframe>
+        
+        <div id="vrControls">
+            <p>🎮 VR Controls</p>
+            <button class="control-button" onclick="toggleFullscreen()">📺 Fullscreen</button>
+            <button class="control-button" onclick="resetView()">🔄 Reset View</button>
+            <button class="control-button" onclick="toggleQuality()">⚙️ Quality</button>
+        </div>
+    </div>
+    
+    <script>
+        let isFullscreen = false;
+        
+        function toggleFullscreen() {
+            const container = document.getElementById('vrContainer');
+            
+            if (!isFullscreen) {
+                if (container.requestFullscreen) {
+                    container.requestFullscreen();
+                } else if (container.webkitRequestFullscreen) {
+                    container.webkitRequestFullscreen();
+                } else if (container.mozRequestFullScreen) {
+                    container.mozRequestFullScreen();
+                }
+                isFullscreen = true;
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                }
+                isFullscreen = false;
+            }
+        }
+        
+        function resetView() {
+            // Reset the YouTube player view (this would require YouTube API)
+            console.log('Reset view');
+        }
+        
+        function toggleQuality() {
+            // Toggle video quality (this would require YouTube API)
+            console.log('Toggle quality');
+        }
+        
+        // Hide controls after 5 seconds
+        setTimeout(() => {
+            document.getElementById('vrOverlay').style.opacity = '0.5';
+            document.getElementById('vrControls').style.opacity = '0.5';
+        }, 5000);
+        
+        // Show controls on touch/click
+        document.addEventListener('click', () => {
+            document.getElementById('vrOverlay').style.opacity = '1';
+            document.getElementById('vrControls').style.opacity = '1';
+            
+            setTimeout(() => {
+                document.getElementById('vrOverlay').style.opacity = '0.5';
+                document.getElementById('vrControls').style.opacity = '0.5';
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
+`;
 
 export default function VRScreen() {
   const [selectedExperience, setSelectedExperience] = useState<any>(null);
@@ -80,12 +231,14 @@ export default function VRScreen() {
 
           {/* VR Video Player */}
           <WebView
-            source={{ uri: selectedExperience.videoUrl }}
+            source={{ html: generateVRHTML(selectedExperience.videoId, selectedExperience.title) }}
             style={styles.webView}
             allowsFullscreenVideo
             mediaPlaybackRequiresUserAction={false}
             javaScriptEnabled
             domStorageEnabled
+            allowsInlineMediaPlayback
+            mixedContentMode="compatibility"
           />
 
           {/* VR Controls */}
