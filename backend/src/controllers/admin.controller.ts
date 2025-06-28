@@ -32,8 +32,8 @@ export const approveProvider = async (req: AuthRequest, res: Response) => {
     );
 
     if (!provider) {
-       res.status(404).json({ message: "Provider not found" });
-       return
+      res.status(404).json({ message: "Provider not found" });
+      return;
     }
 
     res.json({ message: "Provider approved", provider });
@@ -72,8 +72,8 @@ export const approveExperience = async (req: AuthRequest, res: Response) => {
     );
 
     if (!experience) {
-       res.status(404).json({ message: "Experience not found" });
-       return
+      res.status(404).json({ message: "Experience not found" });
+      return;
     }
 
     res.json({ message: "Experience approved", experience });

@@ -15,20 +15,20 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
     const { experienceId } = req.body;
 
     if (!experienceId) {
-       res.status(400).json({ message: "Experience ID is required" });
-       return
+      res.status(400).json({ message: "Experience ID is required" });
+      return;
     }
 
     const experience = await Experience.findById(experienceId);
 
     if (!experience || experience.status !== "approved") {
-       res.status(400).json({ message: "Invalid or unapproved experience" });
-       return
+      res.status(400).json({ message: "Invalid or unapproved experience" });
+      return;
     }
 
     const booking = new Booking({
       experience: experienceId,
-      traveler: req.user?.uid,
+      traveler: req.user?.id,
       status: "pending",
     });
 
@@ -52,7 +52,6 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
   }
 };
 
-
 /**
  * @desc Traveler views their bookings
  * @route GET /api/bookings/mine
@@ -60,7 +59,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
  */
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   try {
-    const bookings = await Booking.find({ traveler: req.user?.uid })
+    const bookings = await Booking.find({ traveler: req.user?.id })
       .populate("experience", "title category")
       .sort({ createdAt: -1 });
 

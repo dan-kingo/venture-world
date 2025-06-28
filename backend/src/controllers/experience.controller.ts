@@ -12,8 +12,8 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
     const { title, description, image, price, category } = req.body;
 
     if (!title || !description || !image || !category) {
-       res.status(400).json({ message: "All fields are required" });
-       return
+      res.status(400).json({ message: "All fields are required" });
+      return;
     }
 
     const experience = new Experience({
@@ -22,7 +22,7 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
       image,
       price,
       category,
-      provider: req.user?.uid,
+      provider: req.user?.id,
       status: "pending",
     });
 
@@ -57,7 +57,7 @@ export const getApprovedExperiences = async (req: Request, res: Response) => {
  */
 export const getMyExperiences = async (req: AuthRequest, res: Response) => {
   try {
-    const experiences = await Experience.find({ provider: req.user?.uid });
+    const experiences = await Experience.find({ provider: req.user?.id });
 
     res.json(experiences);
   } catch (err) {

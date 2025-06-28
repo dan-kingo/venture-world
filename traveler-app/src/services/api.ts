@@ -1,25 +1,5 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
-import { initializeApp } from 'firebase/app';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence, onAuthStateChanged } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyBbQ5l0PueNEGeWKn9jvf6DrYlX60atoJk",
-  authDomain: "venture-world-1123.firebaseapp.com",
-  projectId: "venture-world-1123",
-  storageBucket: "venture-world-1123.firebasestorage.app",
-  messagingSenderId: "483733490793",
-  appId: "1:483733490793:web:67a111b328a44f7650e6f8",
-  measurementId: "G-L256W2HEEC"
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const auth = initializeAuth(firebaseApp, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
 
 // Backend URL - update this to match your backend server
 const API_BASE_URL = __DEV__ ? 'http://localhost:3000/api' : 'https://your-production-api.com/api';
@@ -72,36 +52,14 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
       
-      // Save token to SecureStore
+      // Save token and user data to SecureStore
       await SecureStore.setItemAsync('authToken', token);
+      await SecureStore.setItemAsync('user', JSON.stringify(user));
       
-      // Get user data from your backend
-      try {
-        const response = await api.get('/me');
-        const userData = response.data;
-        
-        if (userData) {
-          await SecureStore.setItemAsync('user', JSON.stringify(userData));
-        }
-        
-        return userData;
-      } catch (backendError) {
-        // If backend is not available, create user data from Firebase
-        const userData = {
-          id: userCredential.user.uid,
-          name: userCredential.user.displayName || 'User',
-          email: userCredential.user.email,
-          role: 'traveler',
-          interests: [],
-          firebaseUid: userCredential.user.uid,
-        };
-        
-        await SecureStore.setItemAsync('user', JSON.stringify(userData));
-        return userData;
-      }
+      return user;
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -110,38 +68,14 @@ export const authAPI = {
 
   register: async (userData: any) => {
     try {
-      const { email, password, ...rest } = userData;
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const token = await userCredential.user.getIdToken();
+      const response = await api.post('/auth/register', userData);
+      const { token, user } = response.data;
       
-      // Save token to SecureStore
+      // Save token and user data to SecureStore
       await SecureStore.setItemAsync('authToken', token);
+      await SecureStore.setItemAsync('user', JSON.stringify(user));
       
-      // Try to create user profile in your backend
-      try {
-        const response = await api.post('/auth/setup', {
-          firebaseUid: userCredential.user.uid,
-          email,
-          ...rest
-        });
-        
-        if (response.data) {
-          await SecureStore.setItemAsync('user', JSON.stringify(response.data.user));
-        }
-        
-        return response.data.user;
-      } catch (backendError) {
-        // If backend is not available, create user data locally
-        const newUserData = {
-          id: userCredential.user.uid,
-          email,
-          firebaseUid: userCredential.user.uid,
-          ...rest
-        };
-        
-        await SecureStore.setItemAsync('user', JSON.stringify(newUserData));
-        return newUserData;
-      }
+      return user;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
@@ -150,7 +84,6 @@ export const authAPI = {
 
   logout: async () => {
     try {
-      await auth.signOut();
       await SecureStore.deleteItemAsync('authToken');
       await SecureStore.deleteItemAsync('user');
     } catch (error) {
@@ -158,20 +91,9 @@ export const authAPI = {
     }
   },
 
-  setupProfile: async (profileData: any) => {
-    try {
-      const response = await api.post('/auth/setup', profileData);
-      return response.data;
-    } catch (error) {
-      console.error('Setup profile error:', error);
-      // Return mock success if backend is not available
-      return { success: true, user: profileData };
-    }
-  },
-
   getProfile: async () => {
     try {
-      const response = await api.get('/me');
+      const response = await api.get('/auth/me');
       if (response.data) {
         await SecureStore.setItemAsync('user', JSON.stringify(response.data));
       }
@@ -184,10 +106,60 @@ export const authAPI = {
     }
   },
 
-  getCurrentUser: () => auth.currentUser,
-  
-  onAuthStateChanged: (callback: (user: any) => void) => {
-    return onAuthStateChanged(auth, callback);
+  updateProfile: async (profileData: any) => {
+    try {
+      const response = await api.put('/auth/profile', profileData);
+      if (response.data.user) {
+        await SecureStore.setItemAsync('user', JSON.stringify(response.data.user));
+      }
+      return response.data;
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error;
+    }
+  },
+
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    try {
+      const response = await api.put('/auth/change-password', {
+        currentPassword,
+        newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Change password error:', error);
+      throw error;
+    }
+  },
+
+  forgotPassword: async (email: string) => {
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      throw error;
+    }
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    try {
+      const response = await api.post('/auth/reset-password', { token, newPassword });
+      return response.data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      throw error;
+    }
+  },
+
+  savePushToken: async (expoPushToken: string) => {
+    try {
+      const response = await api.post('/auth/push-token', { expoPushToken });
+      return response.data;
+    } catch (error) {
+      console.error('Save push token error:', error);
+      throw error;
+    }
   },
 };
 
@@ -270,5 +242,4 @@ export const itinerariesAPI = {
   },
 };
 
-export { auth };
 export default api;

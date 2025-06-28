@@ -1,13 +1,15 @@
-
 import { Document } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
-  email?: string;
+  email: string;
+  password: string;
   phone?: string;
   role: "traveler" | "provider" | "admin";
   interests?: string[];
   status: "pending" | "approved" | "rejected";
-  firebaseUid: string;
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
   expoPushToken?: string;
+  comparePassword(candidatePassword: string): Promise<boolean>;
 }

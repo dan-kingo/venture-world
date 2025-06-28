@@ -1,18 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import admin from "firebase-admin";
+import jwt from "jsonwebtoken";
 import User from "../models/user.model";
-
-
-if (admin.apps.length === 0) {
-  admin.initializeApp({
-    credential: admin.credential.applicationDefault(), 
-   
-  });
-}
 
 export interface AuthRequest extends Request {
   user?: {
-    uid: string;
+    id: string;
     role: string;
   };
 }
@@ -21,24 +13,24 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-     res.status(401).json({ message: "Missing or invalid token" });
-     return
+    res.status(401).json({ message: "Missing or invalid token" });
+    return;
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
-    const decodedToken = await admin.auth().verifyIdToken(token);
-
-    const user = await User.findOne({ firebaseUid: decodedToken.uid });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string };
+    
+    const user = await User.findById(decoded.id);
 
     if (!user) {
-       res.status(401).json({ message: "User not found" });
-       return
+      res.status(401).json({ message: "User not found" });
+      return;
     }
 
     req.user = {
-      uid: user.firebaseUid, 
+      id: user._id.toString(),
       role: user.role,
     };
 
@@ -52,8 +44,8 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 export const authorize = (roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.role)) {
-       res.status(403).json({ message: "Forbidden" });
-       return
+      res.status(403).json({ message: "Forbidden" });
+      return;
     }
     next();
   };
