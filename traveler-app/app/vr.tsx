@@ -17,24 +17,24 @@ const vrExperiences = [
     title: 'Lalibela Rock Churches',
     description: 'Explore the magnificent rock-hewn churches in 360°',
     thumbnail: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
-    videoId: 'MJjjhrfYWqM', // Example 360° video ID
-    duration: '8 min',
+    videoId: 'JJS5txGEbWA', // Example 360° video ID
+    duration: '3 min',
   },
   {
     id: '2',
     title: 'Simien Mountains',
     description: 'Breathtaking views of Ethiopia\'s highest peaks',
     thumbnail: 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg',
-    videoId: 'ChOhcHD8fBA', // Example 360° video ID
-    duration: '12 min',
+    videoId: 'ORj2xCrRa4o', // Example 360° video ID
+    duration: '1 min',
   },
   {
     id: '3',
-    title: 'Danakil Depression',
-    description: 'Journey to one of the hottest places on Earth',
+    title: 'Gonder Castle',
+    description: 'Journey to one of the greatest castles in Africa',
     thumbnail: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg',
-    videoId: 'Uvufun6xer8', // Example 360° video ID
-    duration: '15 min',
+    videoId: '9X9glTHr1PQ', // Example 360° video ID
+    duration: '3 min',
   },
 ];
 
@@ -141,6 +141,26 @@ const generateVRHTML = (videoId: string, title: string) => `
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .dismiss-button {
+            background: #FFD700;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            margin-top: 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .dismiss-button:hover {
+            background: #ffcc00;
+        }
+
+        .dismiss-button:active {
+            background: #e6b800;
+        }
     </style>
 </head>
 <body>
@@ -151,9 +171,8 @@ const generateVRHTML = (videoId: string, title: string) => `
         </div>
         
         <div id="vrOverlay">
-            <h3>🥽 ${title}</h3>
-            <p>Use your device's gyroscope or drag to look around in 360°</p>
-            <p>Tap screen to show/hide controls</p>
+            <p>For a better immersive experience, visit this video on YouTube</p>
+            <button class="dismiss-button" onclick="dismissOverlay()">Dismiss</button>
         </div>
         
         <iframe
@@ -170,6 +189,7 @@ const generateVRHTML = (videoId: string, title: string) => `
             <button class="control-button" onclick="resetView()">🔄 Reset View</button>
             <button class="control-button" onclick="toggleQuality()">⚙️ Quality</button>
             <button class="control-button" onclick="togglePlayback()">⏯️ Play/Pause</button>
+            <button class="control-button" onclick="openInYouTube()">Open in YouTube</button>
         </div>
     </div>
     
@@ -247,6 +267,18 @@ const generateVRHTML = (videoId: string, title: string) => `
                     player.playVideo();
                 }
             }
+        }
+        
+        function dismissOverlay() {
+            document.getElementById('vrOverlay').style.display = 'none';
+        }
+
+        function openInYouTube() {
+            // Try to open in YouTube app, fallback to browser
+            window.location.href = 'vnd.youtube://watch?v=${videoId}';
+            setTimeout(() => {
+                window.location.href = 'https://www.youtube.com/watch?v=${videoId}';
+            }, 500);
         }
         
         // Hide controls after 5 seconds
@@ -346,6 +378,7 @@ export default function VRScreen() {
   if (isPlaying && selectedExperience) {
     return (
       <View style={styles.container}>
+
         <SafeAreaView style={styles.safeArea}>
           {/* VR Player Header */}
           <Animated.View entering={FadeInUp.delay(200)} style={styles.playerHeader}>
@@ -761,7 +794,7 @@ const styles = StyleSheet.create({
   },
   floatingCard: {
     backgroundColor: colors.surface,
-    borderRadius: 12,
+    borderRadius:12,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
