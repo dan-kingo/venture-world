@@ -81,30 +81,28 @@ export default function HomeScreen() {
           {/* Quick Actions */}
           <Animated.View entering={FadeInDown.delay(400)} style={styles.section}>
             <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.quickActionsContainer}
-            >
+            <View style={styles.quickActionsGrid}>
               {quickActions.map((action, index) => (
                 <Animated.View
                   key={action.title}
                   entering={FadeInRight.delay(600 + index * 100)}
-                  style={styles.quickActionWrapper}
+                  style={styles.quickActionContainer}
                 >
                   <Card style={styles.quickActionCard} onPress={action.onPress}>
                     <LinearGradient
                       colors={action.gradient}
                       style={styles.quickActionGradient}
                     >
-                      <Text style={styles.quickActionIcon}>{action.icon}</Text>
-                      <Text style={styles.quickActionTitle}>{action.title}</Text>
-                      <Text style={styles.quickActionDescription}>{action.description}</Text>
+                      <View style={styles.quickActionContent}>
+                        <Text style={styles.quickActionIcon}>{action.icon}</Text>
+                        <Text style={styles.quickActionTitle}>{action.title}</Text>
+                        <Text style={styles.quickActionDescription}>{action.description}</Text>
+                      </View>
                     </LinearGradient>
                   </Card>
                 </Animated.View>
               ))}
-            </ScrollView>
+            </View>
           </Animated.View>
 
           {/* Featured Experiences */}
@@ -243,16 +241,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-SemiBold',
   },
-  quickActionsContainer: {
+  quickActionsGrid: {
+    flexDirection: 'row',
     paddingHorizontal: spacing.lg,
-    paddingRight: spacing.lg,
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
   },
-  quickActionWrapper: {
-    marginRight: spacing.md,
+  quickActionContainer: {
+    width: (width - spacing.lg * 2 - spacing.md * 2) / 3,
+    marginBottom: spacing.md,
   },
   quickActionCard: {
-    width: 150,
-    height: 150,
     borderRadius: 16,
     overflow: 'hidden',
     elevation: 4,
@@ -262,30 +261,35 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
   },
   quickActionGradient: {
-    flex: 1,
-    padding: spacing.md,
+    minHeight: 120,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  quickActionContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.md,
+  },
   quickActionIcon: {
-    fontSize: 32,
+    fontSize: 28,
     marginBottom: spacing.sm,
   },
   quickActionTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: 'Poppins-Bold',
     color: colors.onPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   quickActionDescription: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'Poppins-Regular',
     color: colors.onPrimary,
     textAlign: 'center',
     opacity: 0.9,
-    lineHeight: 14,
+    lineHeight: 12,
   },
   experienceCard: {
     marginHorizontal: spacing.lg,
