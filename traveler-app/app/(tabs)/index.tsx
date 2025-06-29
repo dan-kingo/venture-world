@@ -90,6 +90,7 @@ export default function HomeScreen() {
                 <Animated.View
                   key={action.title}
                   entering={FadeInRight.delay(600 + index * 100)}
+                  style={styles.quickActionWrapper}
                 >
                   <Card style={styles.quickActionCard} onPress={action.onPress}>
                     <LinearGradient
@@ -195,7 +196,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 120, // Increased padding to prevent content being hidden behind tab bar
+    paddingBottom: 120,
   },
   header: {
     paddingHorizontal: spacing.lg,
@@ -244,13 +245,21 @@ const styles = StyleSheet.create({
   },
   quickActionsContainer: {
     paddingHorizontal: spacing.lg,
-    gap: spacing.md,
+    paddingRight: spacing.lg,
+  },
+  quickActionWrapper: {
+    marginRight: spacing.md,
   },
   quickActionCard: {
-    width: 140,
-    height: 140, // Increased height to accommodate text
+    width: 150,
+    height: 150,
     borderRadius: 16,
     overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   quickActionGradient: {
     flex: 1,
@@ -259,12 +268,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickActionIcon: {
-    fontSize: 28, // Slightly larger icon
+    fontSize: 32,
     marginBottom: spacing.sm,
   },
   quickActionTitle: {
     fontSize: 14,
-    fontFamily: 'Poppins-Bold', // Changed to Bold for better visibility
+    fontFamily: 'Poppins-Bold',
     color: colors.onPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,

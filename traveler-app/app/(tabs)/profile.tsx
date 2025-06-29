@@ -33,32 +33,32 @@ export default function ProfileScreen() {
     {
       title: 'Edit Profile',
       icon: 'account-edit',
-      onPress: () => {},
+      onPress: () => router.push('/profile/edit-profile'),
     },
     {
       title: 'Language Settings',
       icon: 'translate',
-      onPress: () => router.push('/language'),
+      onPress: () => router.push('/profile/language-settings'),
     },
     {
       title: 'Notifications',
       icon: 'bell-outline',
-      onPress: () => {},
+      onPress: () => router.push('/profile/notifications'),
     },
     {
       title: 'Privacy & Security',
       icon: 'shield-account',
-      onPress: () => {},
+      onPress: () => router.push('/profile/privacy-security'),
     },
     {
       title: 'Help & Support',
       icon: 'help-circle-outline',
-      onPress: () => {},
+      onPress: () => router.push('/profile/help-support'),
     },
     {
       title: 'About',
       icon: 'information-outline',
-      onPress: () => {},
+      onPress: () => router.push('/profile/about'),
     },
   ];
 
