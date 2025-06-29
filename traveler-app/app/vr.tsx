@@ -25,8 +25,8 @@ const vrExperiences = [
     title: 'Simien Mountains',
     description: 'Breathtaking views of Ethiopia\'s highest peaks',
     thumbnail: 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg',
-    videoId: 'ORj2xCrRa4o', // Example 360° video ID
-    duration: '1 min',
+    videoId: 'ME3rb2kd5C8', // Example 360° video ID
+    duration: '2 min',
   },
   {
     id: '3',
