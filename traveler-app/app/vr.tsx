@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Text, Button, IconButton, Card } from 'react-native-paper';
 import { WebView } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { router } from 'expo-router';
 
 import { colors, spacing } from '../src/theme/theme';
@@ -305,6 +305,33 @@ const generateVRHTML = (videoId: string, title: string) => `
 export default function VRScreen() {
   const [selectedExperience, setSelectedExperience] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showRequirements, setShowRequirements] = useState(true);
+  
+  const requirementsOpacity = useSharedValue(1);
+
+  useEffect(() => {
+    // Auto-hide requirements card after 5 seconds
+    const timer = setTimeout(() => {
+      requirementsOpacity.value = withTiming(0.3, { duration: 500 });
+      setShowRequirements(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const toggleRequirements = () => {
+    if (showRequirements) {
+      requirementsOpacity.value = withTiming(0.3, { duration: 300 });
+      setShowRequirements(false);
+    } else {
+      requirementsOpacity.value = withTiming(1, { duration: 300 });
+      setShowRequirements(true);
+    }
+  };
+
+  const requirementsAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: requirementsOpacity.value,
+  }));
 
   const startVRExperience = (experience: any) => {
     setSelectedExperience(experience);
@@ -356,6 +383,30 @@ export default function VRScreen() {
               console.log('VR WebView message:', event.nativeEvent.data);
             }}
           />
+
+          {/* Floating Requirements Card */}
+          <Animated.View style={[styles.floatingRequirements, requirementsAnimatedStyle]}>
+            <Card style={styles.floatingCard} onPress={toggleRequirements}>
+              <Card.Content style={styles.floatingContent}>
+                <View style={styles.floatingHeader}>
+                  <Text style={styles.floatingTitle}>VR Tips</Text>
+                  <IconButton
+                    icon={showRequirements ? "chevron-up" : "chevron-down"}
+                    iconColor={colors.primary}
+                    size={20}
+                    onPress={toggleRequirements}
+                  />
+                </View>
+                {showRequirements && (
+                  <Text style={styles.floatingText}>
+                    • Use headphones for immersive audio{'\n'}
+                    • Rotate device for 360° viewing{'\n'}
+                    • Tap screen to show/hide controls
+                  </Text>
+                )}
+              </Card.Content>
+            </Card>
+          </Animated.View>
 
           {/* VR Controls */}
           <Animated.View entering={FadeInDown.delay(400)} style={styles.vrControls}>
@@ -423,86 +474,92 @@ export default function VRScreen() {
           />
         </Animated.View>
 
-        {/* VR Introduction */}
-        <Animated.View entering={FadeInDown.delay(400)} style={styles.introSection}>
-          <Card style={styles.introCard}>
-            <LinearGradient
-              colors={[colors.primary, colors.secondary]}
-              style={styles.introGradient}
-            >
-              <Text style={styles.introIcon}>🥽</Text>
-              <Text style={styles.introTitle}>Virtual Reality Tours</Text>
-              <Text style={styles.introDescription}>
-                Experience Ethiopia's wonders from anywhere in the world with immersive 360° YouTube videos
-              </Text>
-            </LinearGradient>
-          </Card>
-        </Animated.View>
-
-        {/* VR Experiences List */}
-        <View style={styles.experiencesSection}>
-          <Text style={styles.sectionTitle}>Available Experiences</Text>
-          
-          {vrExperiences.map((experience, index) => (
-            <Animated.View
-              key={experience.id}
-              entering={FadeInDown.delay(600 + index * 100)}
-            >
-              <Card
-                style={styles.experienceCard}
-                onPress={() => startVRExperience(experience)}
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* VR Introduction */}
+          <Animated.View entering={FadeInDown.delay(400)} style={styles.introSection}>
+            <Card style={styles.introCard}>
+              <LinearGradient
+                colors={[colors.primary, colors.secondary]}
+                style={styles.introGradient}
               >
-                <View style={styles.experienceContent}>
-                  <Card.Cover
-                    source={{ uri: experience.thumbnail }}
-                    style={styles.experienceThumbnail}
-                  />
-                  
-                  <View style={styles.experienceDetails}>
-                    <Text style={styles.experienceTitle}>{experience.title}</Text>
-                    <Text style={styles.experienceDescription} numberOfLines={2}>
-                      {experience.description}
-                    </Text>
+                <Text style={styles.introIcon}>🥽</Text>
+                <Text style={styles.introTitle}>Virtual Reality Tours</Text>
+                <Text style={styles.introDescription}>
+                  Experience Ethiopia's wonders from anywhere in the world with immersive 360° YouTube videos
+                </Text>
+              </LinearGradient>
+            </Card>
+          </Animated.View>
+
+          {/* VR Experiences List */}
+          <View style={styles.experiencesSection}>
+            <Text style={styles.sectionTitle}>Available Experiences</Text>
+            
+            {vrExperiences.map((experience, index) => (
+              <Animated.View
+                key={experience.id}
+                entering={FadeInDown.delay(600 + index * 100)}
+              >
+                <Card
+                  style={styles.experienceCard}
+                  onPress={() => startVRExperience(experience)}
+                >
+                  <View style={styles.experienceContent}>
+                    <Card.Cover
+                      source={{ uri: experience.thumbnail }}
+                      style={styles.experienceThumbnail}
+                    />
                     
-                    <View style={styles.experienceFooter}>
-                      <Text style={styles.experienceDuration}>
-                        🕐 {experience.duration}
+                    <View style={styles.experienceDetails}>
+                      <Text style={styles.experienceTitle}>{experience.title}</Text>
+                      <Text style={styles.experienceDescription} numberOfLines={2}>
+                        {experience.description}
                       </Text>
-                      <View style={styles.vrBadge}>
-                        <Text style={styles.vrBadgeText}>360° YouTube</Text>
+                      
+                      <View style={styles.experienceFooter}>
+                        <Text style={styles.experienceDuration}>
+                          🕐 {experience.duration}
+                        </Text>
+                        <View style={styles.vrBadge}>
+                          <Text style={styles.vrBadgeText}>360° YouTube</Text>
+                        </View>
                       </View>
                     </View>
+                    
+                    <View style={styles.playButtonContainer}>
+                      <IconButton
+                        icon="play"
+                        iconColor={colors.onPrimary}
+                        size={24}
+                        style={styles.playButton}
+                      />
+                    </View>
                   </View>
-                  
-                  <View style={styles.playButtonContainer}>
-                    <IconButton
-                      icon="play"
-                      iconColor={colors.onPrimary}
-                      size={24}
-                      style={styles.playButton}
-                    />
-                  </View>
-                </View>
-              </Card>
-            </Animated.View>
-          ))}
-        </View>
+                </Card>
+              </Animated.View>
+            ))}
+          </View>
 
-        {/* VR Requirements */}
-        <Animated.View entering={FadeInDown.delay(1000)} style={styles.requirementsSection}>
-          <Card style={styles.requirementsCard}>
-            <Card.Content style={styles.requirementsContent}>
-              <Text style={styles.requirementsTitle}>For Best Experience:</Text>
-              <Text style={styles.requirementsText}>
-                • Use headphones for immersive audio{'\n'}
-                • Rotate your device for 360° viewing{'\n'}
-                • Ensure stable internet connection{'\n'}
-                • Use VR headset if available{'\n'}
-                • Tap screen to show/hide controls
-              </Text>
-            </Card.Content>
-          </Card>
-        </Animated.View>
+          {/* VR Requirements */}
+          <Animated.View entering={FadeInDown.delay(1000)} style={styles.requirementsSection}>
+            <Card style={styles.requirementsCard}>
+              <Card.Content style={styles.requirementsContent}>
+                <Text style={styles.requirementsTitle}>For Best Experience:</Text>
+                <Text style={styles.requirementsText}>
+                  • Use headphones for immersive audio{'\n'}
+                  • Rotate your device for 360° viewing{'\n'}
+                  • Ensure stable internet connection{'\n'}
+                  • Use VR headset if available{'\n'}
+                  • Tap screen to show/hide controls
+                </Text>
+              </Card.Content>
+            </Card>
+          </Animated.View>
+        </ScrollView>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -521,6 +578,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
   headerBackButton: {
     backgroundColor: colors.surface,
@@ -532,6 +590,12 @@ const styles = StyleSheet.create({
   },
   infoButton: {
     backgroundColor: colors.surface,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xl,
   },
   introSection: {
     paddingHorizontal: spacing.lg,
@@ -565,8 +629,8 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   experiencesSection: {
-    flex: 1,
     paddingHorizontal: spacing.lg,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
     fontSize: 20,
@@ -636,7 +700,6 @@ const styles = StyleSheet.create({
   },
   requirementsSection: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.lg,
   },
   requirementsCard: {
     backgroundColor: colors.surface,
@@ -688,6 +751,42 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
+  },
+  floatingRequirements: {
+    position: 'absolute',
+    top: 80,
+    right: spacing.md,
+    left: spacing.md,
+    zIndex: 1000,
+  },
+  floatingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  floatingContent: {
+    padding: spacing.sm,
+  },
+  floatingHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  floatingTitle: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Bold',
+    color: colors.primary,
+  },
+  floatingText: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Regular',
+    color: colors.text,
+    lineHeight: 16,
+    marginTop: spacing.xs,
   },
   vrControls: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import { Text, Button, IconButton, Card } from 'react-native-paper';
 import { WebView } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -338,62 +338,68 @@ export default function ARScreen() {
           />
         </Animated.View>
 
-        {/* AR Introduction */}
-        <Animated.View entering={FadeInDown.delay(400)} style={styles.introSection}>
-          <Card style={styles.introCard}>
-            <Card.Content style={styles.introContent}>
-              <Text style={styles.introIcon}>📱</Text>
-              <Text style={styles.introTitle}>Augmented Reality Tours</Text>
-              <Text style={styles.introDescription}>
-                Experience Ethiopian heritage sites through cutting-edge AR technology powered by WebAR.js
-              </Text>
-            </Card.Content>
-          </Card>
-        </Animated.View>
-
-        {/* Features */}
-        <Animated.View entering={FadeInDown.delay(600)} style={styles.featuresSection}>
-          <Text style={styles.sectionTitle}>AR Features</Text>
-          
-          <Card style={styles.featureCard}>
-            <Card.Content style={styles.featureContent}>
-              <Text style={styles.featureIcon}>🏛️</Text>
-              <View style={styles.featureDetails}>
-                <Text style={styles.featureTitle}>3D Historical Models</Text>
-                <Text style={styles.featureDescription}>
-                  View detailed 3D reconstructions of ancient sites using WebAR.js
+        <ScrollView 
+          style={styles.scrollView} 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* AR Introduction */}
+          <Animated.View entering={FadeInDown.delay(400)} style={styles.introSection}>
+            <Card style={styles.introCard}>
+              <Card.Content style={styles.introContent}>
+                <Text style={styles.introIcon}>📱</Text>
+                <Text style={styles.introTitle}>Augmented Reality Tours</Text>
+                <Text style={styles.introDescription}>
+                  Experience Ethiopian heritage sites through cutting-edge AR technology powered by WebAR.js
                 </Text>
-              </View>
-            </Card.Content>
-          </Card>
+              </Card.Content>
+            </Card>
+          </Animated.View>
 
-          <Card style={styles.featureCard}>
-            <Card.Content style={styles.featureContent}>
-              <Text style={styles.featureIcon}>📚</Text>
-              <View style={styles.featureDetails}>
-                <Text style={styles.featureTitle}>Interactive Information</Text>
-                <Text style={styles.featureDescription}>
-                  Access historical facts and cultural insights in real-time
-                </Text>
-              </View>
-            </Card.Content>
-          </Card>
+          {/* Features */}
+          <Animated.View entering={FadeInDown.delay(600)} style={styles.featuresSection}>
+            <Text style={styles.sectionTitle}>AR Features</Text>
+            
+            <Card style={styles.featureCard}>
+              <Card.Content style={styles.featureContent}>
+                <Text style={styles.featureIcon}>🏛️</Text>
+                <View style={styles.featureDetails}>
+                  <Text style={styles.featureTitle}>3D Historical Models</Text>
+                  <Text style={styles.featureDescription}>
+                    View detailed 3D reconstructions of ancient sites using WebAR.js
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
 
-          <Card style={styles.featureCard}>
-            <Card.Content style={styles.featureContent}>
-              <Text style={styles.featureIcon}>🎯</Text>
-              <View style={styles.featureDetails}>
-                <Text style={styles.featureTitle}>Marker-based Tracking</Text>
-                <Text style={styles.featureDescription}>
-                  Point at surfaces or use Hiro markers for AR activation
-                </Text>
-              </View>
-            </Card.Content>
-          </Card>
-        </Animated.View>
+            <Card style={styles.featureCard}>
+              <Card.Content style={styles.featureContent}>
+                <Text style={styles.featureIcon}>📚</Text>
+                <View style={styles.featureDetails}>
+                  <Text style={styles.featureTitle}>Interactive Information</Text>
+                  <Text style={styles.featureDescription}>
+                    Access historical facts and cultural insights in real-time
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
 
-        {/* Start AR Button */}
-        <Animated.View entering={FadeInDown.delay(800)} style={styles.startSection}>
+            <Card style={styles.featureCard}>
+              <Card.Content style={styles.featureContent}>
+                <Text style={styles.featureIcon}>🎯</Text>
+                <View style={styles.featureDetails}>
+                  <Text style={styles.featureTitle}>Marker-based Tracking</Text>
+                  <Text style={styles.featureDescription}>
+                    Point at surfaces or use Hiro markers for AR activation
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
+          </Animated.View>
+        </ScrollView>
+
+        {/* Fixed Start AR Button */}
+        <Animated.View entering={FadeInDown.delay(800)} style={styles.fixedStartSection}>
           <Button
             mode="contained"
             onPress={startARExperience}
@@ -428,6 +434,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
   headerBackButton: {
     backgroundColor: colors.surface,
@@ -439,6 +446,12 @@ const styles = StyleSheet.create({
   },
   infoButton: {
     backgroundColor: colors.surface,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xl,
   },
   introSection: {
     paddingHorizontal: spacing.lg,
@@ -471,7 +484,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   featuresSection: {
-    flex: 1,
     paddingHorizontal: spacing.lg,
   },
   sectionTitle: {
@@ -509,14 +521,17 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 20,
   },
-  startSection: {
+  fixedStartSection: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingVertical: spacing.md,
+    backgroundColor: colors.background,
+    borderTopWidth: 1,
+    borderTopColor: colors.surfaceVariant,
   },
   startButton: {
     backgroundColor: colors.primary,
     borderRadius: 25,
-    marginBottom: spacing.md,
+    marginBottom: spacing.sm,
   },
   startButtonContent: {
     paddingVertical: spacing.sm,

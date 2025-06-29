@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 100, // Add padding to prevent content being hidden behind tab bar
+    paddingBottom: 120, // Increased padding to prevent content being hidden behind tab bar
   },
   header: {
     paddingHorizontal: spacing.lg,
@@ -234,6 +234,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Poppins-Bold',
     color: colors.text,
+    paddingHorizontal: spacing.lg,
+    marginBottom: spacing.md,
   },
   seeAllButton: {
     color: colors.primary,
@@ -246,7 +248,7 @@ const styles = StyleSheet.create({
   },
   quickActionCard: {
     width: 140,
-    height: 120,
+    height: 140, // Increased height to accommodate text
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -257,22 +259,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   quickActionIcon: {
-    fontSize: 24,
-    marginBottom: spacing.xs,
+    fontSize: 28, // Slightly larger icon
+    marginBottom: spacing.sm,
   },
   quickActionTitle: {
     fontSize: 14,
-    fontFamily: 'Poppins-SemiBold',
+    fontFamily: 'Poppins-Bold', // Changed to Bold for better visibility
     color: colors.onPrimary,
     textAlign: 'center',
     marginBottom: spacing.xs,
+    lineHeight: 18,
   },
   quickActionDescription: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'Poppins-Regular',
     color: colors.onPrimary,
     textAlign: 'center',
-    opacity: 0.8,
+    opacity: 0.9,
+    lineHeight: 14,
   },
   experienceCard: {
     marginHorizontal: spacing.lg,
