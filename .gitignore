@@ -1,6 +1,8 @@
 # Node modules
 backend/node_modules
 mobile/node_modules
+provider-app/node_modules
+admin-app/node_modules
 web/node_modules
 backend/venture-world-1123-firebase-adminsdk-fbsvc-7ccfe00c83.json
 # Build outputs
@@ -16,6 +18,8 @@ mobile/.expo-shared
 backend/.env
 mobile/.env
 web/.env
+admin-app/.env
+provider-app/.env
 
 # Logs
 *.log
