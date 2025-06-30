@@ -7,26 +7,24 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { colors, spacing } from '../../src/theme/theme';
+import { useExperienceStore } from '../../src/store/experienceStore';
 
 const { width } = Dimensions.get('window');
 
 // Mock experience data - in real app, fetch based on ID
-const mockExperience = {
-  id: '1',
-  title: 'Lalibela Rock Churches AR Tour',
-  description: 'Experience the ancient rock-hewn churches through augmented reality with historical insights and professional guides.',
-  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
-  price: 150,
-  category: 'AR site',
-  provider: { id: '1', name: 'Ethiopian Heritage Tours' },
-  rating: 4.8,
-  duration: '3 hours',
-  location: 'Lalibela',
-};
 
 export default function ExperienceDetailScreen() {
   const { id } = useLocalSearchParams();
-  const experience = mockExperience; // In real app, fetch by ID
+  const { experiences } = useExperienceStore();
+  
+  
+  // Find the experience by ID
+  const experience = experiences.find(exp => exp.id === id);
+
+  // If experience not found or still loading, show nothing (you might want to add loading/error states)
+  if (!experience) {
+    return null;
+  }
 
   const features = [
     { icon: '📱', title: 'AR Experience', description: 'Augmented reality features' },
@@ -106,10 +104,10 @@ export default function ExperienceDetailScreen() {
           <Animated.View entering={FadeInDown.delay(600)} style={styles.titleSection}>
             <Text style={styles.title}>{experience.title}</Text>
             <View style={styles.basicInfo}>
-              <Text style={styles.provider}>by {experience.provider.name}</Text>
+              <Text style={styles.provider}>by {experience.provider?.name || 'Local Guide'}</Text>
               <View style={styles.ratingContainer}>
-                <Text style={styles.rating}>⭐ {experience.rating}</Text>
-                <Text style={styles.duration}>🕐 {experience.duration}</Text>
+                <Text style={styles.rating}>⭐ {experience.rating || '4.8'}</Text>
+                <Text style={styles.duration}>🕐 {experience.duration || '2 hours'}</Text>
               </View>
             </View>
           </Animated.View>
@@ -118,7 +116,7 @@ export default function ExperienceDetailScreen() {
           <Animated.View entering={FadeInDown.delay(800)} style={styles.priceSection}>
             <View style={styles.priceContainer}>
               <Text style={styles.priceLabel}>Price per person</Text>
-              <Text style={styles.price}>${experience.price}</Text>
+              <Text style={styles.price}>${experience.price || '25'}</Text>
             </View>
             <Button
               mode="contained"
@@ -133,7 +131,9 @@ export default function ExperienceDetailScreen() {
           {/* Description */}
           <Animated.View entering={FadeInDown.delay(1000)} style={styles.descriptionSection}>
             <Text style={styles.sectionTitle}>About This Experience</Text>
-            <Text style={styles.description}>{experience.description}</Text>
+            <Text style={styles.description}>
+              {experience.description || 'This immersive experience combines technology with local culture to create unforgettable memories.'}
+            </Text>
           </Animated.View>
 
           {/* Features */}
@@ -159,7 +159,7 @@ export default function ExperienceDetailScreen() {
             <Text style={styles.sectionTitle}>Location</Text>
             <Card style={styles.locationCard}>
               <Card.Content style={styles.locationContent}>
-                <Text style={styles.locationName}>📍 {experience.location}</Text>
+                <Text style={styles.locationName}>📍 {experience.location || 'Central Meeting Point'}</Text>
                 <Text style={styles.locationDescription}>
                   Meeting point and detailed directions will be provided after booking.
                 </Text>
@@ -229,7 +229,7 @@ export default function ExperienceDetailScreen() {
                   style={styles.bottomBookButton}
                   labelStyle={styles.bottomBookButtonLabel}
                 >
-                  Book Experience - ${experience.price}
+                  Book Experience - ${experience.price || '25'}
                 </Button>
               </LinearGradient>
             </Card>
@@ -239,6 +239,7 @@ export default function ExperienceDetailScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
