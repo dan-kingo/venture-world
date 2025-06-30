@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 
 // Backend URL - update this to match your backend server
-const API_BASE_URL = __DEV__ ? 'http://192.168.0.118:3000/api' : 'https://your-production-api.com/api';
+const API_BASE_URL =  'http://192.168.0.118:3000/api';
 
 // Create axios instance
 const api = axios.create({
@@ -57,7 +57,7 @@ const mockUsers = [
     password: 'password123',
     role: 'traveler',
     interests: ['Culture', 'History', 'Adventure'],
-    firebaseUid: 'mock-uid-1',
+    _id: 'mock-uid-1',
   },
   {
     id: '2',
@@ -66,7 +66,7 @@ const mockUsers = [
     password: 'password123',
     role: 'provider',
     interests: ['Tourism', 'Culture'],
-    firebaseUid: 'mock-uid-2',
+    _id: 'mock-uid-2',
   },
   {
     id: '3',
@@ -75,7 +75,7 @@ const mockUsers = [
     password: 'admin123',
     role: 'admin',
     interests: [],
-    firebaseUid: 'mock-uid-3',
+    _id: 'mock-uid-3',
   },
 ];
 
@@ -92,96 +92,67 @@ const checkBackendAvailability = async (): Promise<boolean> => {
 
 // Auth API with backend integration
 export const authAPI = {
-  login: async (email: string, password: string) => {
-    try {
-      const isBackendAvailable = await checkBackendAvailability();
-      
-      if (isBackendAvailable) {
-        // Try backend login first
-        try {
-          // For now, we'll use mock login since Firebase auth is not fully set up
-          // In production, this would be a proper Firebase auth flow
-          const response = await api.post('/auth/login', { email, password });
-          const { token, user } = response.data;
-          
-          await SecureStore.setItemAsync('authToken', token);
-          await SecureStore.setItemAsync('user', JSON.stringify(user));
-          
-          return user;
-        } catch (backendError) {
-          console.log('Backend auth failed, falling back to mock');
-        }
-      }
-      
-      // Fallback to mock authentication
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const user = mockUsers.find(u => u.email === email && u.password === password);
-      
-      if (!user) {
-        throw new Error('Invalid credentials');
-      }
-      
-      const token = `mock-token-${user.id}-${Date.now()}`;
-      await SecureStore.setItemAsync('authToken', token);
-      
-      const { password: _, ...userData } = user;
-      await SecureStore.setItemAsync('user', JSON.stringify(userData));
-      
-      return userData;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  },
 
-  register: async (userData: any) => {
+  login: async (email: string, password: string) => {
+  try {
+    const isBackendAvailable = await checkBackendAvailability();
+
+    if (isBackendAvailable) {
+      try {
+        const response = await api.post('/auth/login', { email, password });
+        const { token, user } = response.data;
+
+        await SecureStore.setItemAsync('authToken', token);
+        await SecureStore.setItemAsync('user', JSON.stringify(user));
+
+        return user;
+      } catch (backendError) {
+        console.log('Backend login failed, falling back to mock login');
+      }
+    }
+
+    // Mock Login Fallback
+    const user = mockUsers.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (!user) {
+      throw new Error("Invalid credentials (mock)");
+    }
+
+    const token = `mock-token-${user.id}-${Date.now()}`;
+
+    await SecureStore.setItemAsync('authToken', token);
+    const { password: _, ...userWithoutPassword } = user;
+    await SecureStore.setItemAsync('user', JSON.stringify(userWithoutPassword));
+
+    return userWithoutPassword;
+
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+},
+register: async (userData: any) => {
     try {
       const isBackendAvailable = await checkBackendAvailability();
-      
-      if (isBackendAvailable) {
-        try {
-          const response = await api.post('/auth/register', userData);
-          const { token, user } = response.data;
-          
-          await SecureStore.setItemAsync('authToken', token);
-          await SecureStore.setItemAsync('user', JSON.stringify(user));
-          
-          return user;
-        } catch (backendError) {
-          console.log('Backend registration failed, falling back to mock');
-        }
+
+      if (!isBackendAvailable) {
+        throw new Error("Backend not available. Please try again later.");
       }
-      
-      // Fallback to mock registration
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const existingUser = mockUsers.find(u => u.email === userData.email);
-      if (existingUser) {
-        throw new Error('Email already exists');
-      }
-      
-      const newUser = {
-        id: `mock-${Date.now()}`,
-        firebaseUid: `mock-uid-${Date.now()}`,
-        ...userData,
-      };
-      
-      mockUsers.push({ ...newUser, password: userData.password });
-      
-      const token = `mock-token-${newUser.id}-${Date.now()}`;
+
+      const response = await api.post('/auth/register', userData);
+      const { token, user } = response.data;
+
       await SecureStore.setItemAsync('authToken', token);
-      
-      const { password: _, ...userDataWithoutPassword } = newUser;
-      await SecureStore.setItemAsync('user', JSON.stringify(userDataWithoutPassword));
-      
-      return userDataWithoutPassword;
+      await SecureStore.setItemAsync('user', JSON.stringify(user));
+
+      return user;
     } catch (error) {
       console.error('Registration error:', error);
       throw error;
     }
   },
-
   logout: async () => {
     try {
       await SecureStore.deleteItemAsync('authToken');
@@ -190,6 +161,7 @@ export const authAPI = {
       console.error('Logout error:', error);
     }
   },
+
 
   setupProfile: async (profileData: any) => {
     try {

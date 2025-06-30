@@ -9,7 +9,6 @@ interface User {
   role: string;
   interests: string[];
   language?: string;
-  firebaseUid?: string;
 }
 
 interface AuthState {

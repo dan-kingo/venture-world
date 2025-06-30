@@ -13,7 +13,6 @@ import { useAuthStore } from '../../src/store/authStore';
 interface RegisterForm {
   name: string;
   email: string;
-  phone: string;
   password: string;
   confirmPassword: string;
 }
@@ -50,11 +49,12 @@ export default function RegisterScreen() {
       await register({
         name: data.name,
         email: data.email,
-        phone: data.phone,
         password: data.password,
         role: 'traveler',
         interests: selectedInterests,
       });
+
+      
     } catch (error) {
       Alert.alert('Registration Failed', 'Please try again.');
     }
@@ -137,29 +137,6 @@ export default function RegisterScreen() {
                 <Text style={styles.errorText}>{errors.email.message}</Text>
               )}
 
-              <Controller
-                control={control}
-                name="phone"
-                rules={{ required: 'Phone number is required' }}
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    label="Phone Number"
-                    value={value}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    mode="outlined"
-                    style={styles.input}
-                    outlineColor={colors.surfaceVariant}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    error={!!errors.phone}
-                    keyboardType="phone-pad"
-                  />
-                )}
-              />
-              {errors.phone && (
-                <Text style={styles.errorText}>{errors.phone.message}</Text>
-              )}
 
               <Controller
                 control={control}
@@ -235,7 +212,7 @@ export default function RegisterScreen() {
 
               {/* Interests Section */}
               <View style={styles.interestsSection}>
-                <Text style={styles.interestsTitle}>Your Interests (Optional)</Text>
+                <Text style={styles.interestsTitle}>Your Interests</Text>
                 <View style={styles.interestsContainer}>
                   {interestOptions.map((interest) => (
                     <Chip

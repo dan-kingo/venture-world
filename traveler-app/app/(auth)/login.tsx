@@ -34,22 +34,9 @@ export default function LoginScreen() {
   };
 
   // Demo accounts for testing
-  const demoAccounts = [
-    { email: 'john@example.com', password: 'password123', role: 'Traveler' },
-    { email: 'sarah@example.com', password: 'password123', role: 'Provider' },
-    { email: 'admin@example.com', password: 'admin123', role: 'Admin' },
-  ];
+  
 
-  const fillDemoAccount = (email: string, password: string) => {
-    // This would typically use setValue from react-hook-form
-    // For now, we'll just show an alert with the credentials
-    Alert.alert(
-      'Demo Account',
-      `Email: ${email}\nPassword: ${password}\n\nPlease enter these credentials manually.`,
-      [{ text: 'OK' }]
-    );
-  };
-
+  
   return (
     <LinearGradient
       colors={[colors.background, colors.surface]}
@@ -73,20 +60,7 @@ export default function LoginScreen() {
 
             {/* Demo Accounts */}
             <Animated.View entering={FadeInDown.delay(300)} style={styles.demoSection}>
-              <Text style={styles.demoTitle}>Demo Accounts (Mock Login)</Text>
-              {demoAccounts.map((account, index) => (
-                <Card
-                  key={index}
-                  style={styles.demoCard}
-                  onPress={() => fillDemoAccount(account.email, account.password)}
-                >
-                  <Card.Content style={styles.demoContent}>
-                    <Text style={styles.demoRole}>{account.role}</Text>
-                    <Text style={styles.demoEmail}>{account.email}</Text>
-                    <Text style={styles.demoPassword}>Password: {account.password}</Text>
-                  </Card.Content>
-                </Card>
-              ))}
+            
             </Animated.View>
 
             {/* Form */}
