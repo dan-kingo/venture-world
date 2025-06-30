@@ -19,7 +19,7 @@ app.use(express.json());
 app.use("/api", healthRoutes);
 
 // Other routes
-app.use("/api", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use('/api', experienceRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api', bookingRoutes);

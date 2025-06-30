@@ -1,11 +1,9 @@
 import { Router } from "express";
-import { getMyProfile, savePushToken, setupProfile } from "../controllers/auth.controller";
-import { authenticate } from "../middlewares/auth.middleware";
+import { register, login } from "../controllers/auth.controller";
 
 const router = Router();
 
-router.get("/me", authenticate, getMyProfile);
-router.post("/auth/setup", authenticate, setupProfile);
-router.post("/auth/push-token", authenticate, savePushToken);
+router.post("/register", register);
+router.post("/login", login);
 
 export default router;

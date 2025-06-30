@@ -18,7 +18,7 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
     }
 
     // Find the user by Firebase UID
-    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    const user = await User.findOne({ _id: req.user?.uid });
     
     if (!user) {
       res.status(404).json({ message: "User not found" });
@@ -67,7 +67,7 @@ export const getApprovedExperiences = async (req: Request, res: Response) => {
 export const getMyExperiences = async (req: AuthRequest, res: Response) => {
   try {
     // Find the user by Firebase UID
-    const user = await User.findOne({ firebaseUid: req.user?.uid });
+    const user = await User.findOne({ _id: req.user?.uid });
     
     if (!user) {
       res.status(404).json({ message: "User not found" });

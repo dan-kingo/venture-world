@@ -28,7 +28,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
   try {
     const decodedToken = await admin.auth().verifyIdToken(token);
 
-    const user = await User.findOne({ firebaseUid: decodedToken.uid });
+    const user = await User.findOne({ _id: decodedToken.uid });
 
     if (!user) {
       res.status(401).json({ message: "User not found" });
@@ -36,7 +36,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     req.user = {
-      uid: user.firebaseUid, 
+      uid: user._id.toString(), // Use MongoDB ObjectId as string
       role: user.role,
     };
 
