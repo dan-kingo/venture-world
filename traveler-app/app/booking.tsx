@@ -9,6 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 
 import { colors, spacing } from '../src/theme/theme';
 import { useExperienceStore } from '../src/store/experienceStore';
+import { useItineraryStore } from '../src/store/itineraryStore';
 
 interface BookingForm {
   fullName: string;
@@ -17,35 +18,24 @@ interface BookingForm {
   specialRequests: string;
 }
 
-// Mock data - in real app, fetch based on params
-const mockExperience = {
-  id: '1',
-  title: 'Lalibela Rock Churches AR Tour',
-  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
-  price: 150,
-  provider: { name: 'Ethiopian Heritage Tours' },
-};
-
-const mockItinerary = {
-  id: '1',
-  title: '3-Day Cultural Trip',
-  image: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
-  price: 450,
-  duration: '3 days',
-  difficulty: 'Easy',
-};
-
 export default function BookingScreen() {
   const { experience: experienceId, itinerary: itineraryId } = useLocalSearchParams();
-  const { bookExperience } = useExperienceStore();
+  const { bookExperience, experiences } = useExperienceStore();
+  const { bookItinerary, itineraries } = useItineraryStore();
+  
   const [selectedDate, setSelectedDate] = useState('2024-02-15');
   const [selectedTime, setSelectedTime] = useState('10:00 AM');
   const [numberOfPeople, setNumberOfPeople] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mock data - in real app, fetch based on IDs
-  const experience = experienceId ? mockExperience : null;
-  const itinerary = itineraryId ? mockItinerary : null;
+  // Find the item based on the ID from params
+  const experience = experienceId 
+    ? experiences.find(exp => exp.id === experienceId) 
+    : null;
+  const itinerary = itineraryId 
+    ? itineraries.find(it => it.id === itineraryId) 
+    : null;
+  
   const item = experience || itinerary;
   const isItinerary = !!itinerary;
 
@@ -77,6 +67,18 @@ export default function BookingScreen() {
     try {
       if (experience) {
         await bookExperience(experience.id);
+      } else if (itinerary) {
+        await bookItinerary(itinerary.id, {
+          date: selectedDate,
+          numberOfPeople,
+          contactInfo: {
+            fullName: data.fullName,
+            email: data.email,
+            phone: data.phone,
+          },
+          specialRequests: data.specialRequests,
+          totalPrice,
+        });
       }
       
       // Simulate booking process
@@ -138,7 +140,9 @@ export default function BookingScreen() {
                     {item.title}
                   </Text>
                   <Text style={styles.summaryProvider}>
-                    {isItinerary ? `${item.duration} • ${item.difficulty}` : `by ${item.provider?.name}`}
+                    {isItinerary 
+                      ? `${itinerary.duration} • ${itinerary.difficulty}` 
+                      : `by ${experience.provider?.name}`}
                   </Text>
                   <Text style={styles.summaryPrice}>${item.price} per person</Text>
                 </View>
@@ -175,7 +179,7 @@ export default function BookingScreen() {
             </ScrollView>
           </Animated.View>
 
-          {/* Time Selection */}
+          {/* Time Selection - Only for experiences */}
           {!isItinerary && (
             <Animated.View entering={FadeInDown.delay(800)} style={styles.section}>
               <Text style={styles.sectionTitle}>Select Time</Text>
@@ -368,7 +372,7 @@ export default function BookingScreen() {
             </Button>
             
             <Text style={styles.bookingNote}>
-              You will receive a confirmation email after booking. Free cancellation up to 24 hours before the experience.
+              You will receive a confirmation email after booking. Free cancellation up to 24 hours before the {isItinerary ? 'trip' : 'experience'}.
             </Text>
           </Animated.View>
         </ScrollView>
@@ -377,6 +381,7 @@ export default function BookingScreen() {
   );
 }
 
+// ... keep your existing styles ...
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -14,8 +14,6 @@ const languages = [
   { code: 'am', name: 'Amharic', flag: '🇪🇹', nativeName: 'አማርኛ' },
   { code: 'or', name: 'Oromo', flag: '🇪🇹', nativeName: 'Afaan Oromo' },
   { code: 'ti', name: 'Tigrinya', flag: '🇪🇹', nativeName: 'ትግርኛ' },
-  { code: 'so', name: 'Somali', flag: '🇸🇴', nativeName: 'Soomaali' },
-  { code: 'ar', name: 'Arabic', flag: '🇸🇦', nativeName: 'العربية' },
 ];
 
 export default function LanguageSettingsScreen() {

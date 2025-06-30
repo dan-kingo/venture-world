@@ -14,7 +14,7 @@ const mockBookings = [
   {
     id: '1',
     experienceTitle: 'Lalibela Rock Churches AR Tour',
-    experienceImage: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+    experienceImage: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     status: 'confirmed',
     date: '2024-02-15',
     time: '10:00 AM',
@@ -24,7 +24,7 @@ const mockBookings = [
   {
     id: '2',
     experienceTitle: 'Bale Mountains Eco Adventure',
-    experienceImage: 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg',
+    experienceImage: 'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npUivll5ZGs3cjeGa5WEmKYr-xE1BiwaG8sfp8s0NTb7DgZc5iiPrim1dsy-VpFds5p5z1VMu4NwKgDz0DBrsFnW0TYtIo154l-p5vfbFxV9CdPv-teIUETdISbiNK1Nso3Um-z=s680-w680-h510-rw',
     status: 'pending',
     date: '2024-02-20',
     time: '8:00 AM',
