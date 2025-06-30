@@ -23,11 +23,7 @@ export default function ProfileScreen() {
     );
   };
 
-  const profileStats = [
-    { label: 'Experiences', value: '12' },
-    { label: 'Countries', value: '1' },
-    { label: 'Reviews', value: '8' },
-  ];
+
 
   const menuItems = [
     {
@@ -85,14 +81,7 @@ export default function ProfileScreen() {
                 <Text style={styles.userName}>{user?.name || 'User'}</Text>
                 <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
                 
-                <View style={styles.statsContainer}>
-                  {profileStats.map((stat, index) => (
-                    <View key={stat.label} style={styles.statItem}>
-                      <Text style={styles.statValue}>{stat.value}</Text>
-                      <Text style={styles.statLabel}>{stat.label}</Text>
-                    </View>
-                  ))}
-                </View>
+          
               </LinearGradient>
             </Card>
           </Animated.View>

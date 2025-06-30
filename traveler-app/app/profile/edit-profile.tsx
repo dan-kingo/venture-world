@@ -33,7 +33,6 @@ export default function EditProfileScreen() {
     defaultValues: {
       name: user?.name || '',
       email: user?.email || '',
-      phone: user?.phone || '',
     },
   });
 
@@ -166,24 +165,7 @@ export default function EditProfileScreen() {
               <Text style={styles.errorText}>{errors.email.message}</Text>
             )}
 
-            <Controller
-              control={control}
-              name="phone"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <TextInput
-                  label="Phone Number"
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  mode="outlined"
-                  style={styles.input}
-                  outlineColor={colors.surfaceVariant}
-                  activeOutlineColor={colors.primary}
-                  textColor={colors.text}
-                  keyboardType="phone-pad"
-                />
-              )}
-            />
+            
           </Animated.View>
 
           {/* Interests Section */}
