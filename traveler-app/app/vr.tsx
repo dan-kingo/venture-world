@@ -16,7 +16,7 @@ const vrExperiences = [
     id: '1',
     title: 'Lalibela Rock Churches',
     description: 'Explore the magnificent rock-hewn churches in 360°',
-    thumbnail: 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg',
+    thumbnail: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     videoId: 'JJS5txGEbWA', // Example 360° video ID
     duration: '3 min',
   },
@@ -24,7 +24,7 @@ const vrExperiences = [
     id: '2',
     title: 'Simien Mountains',
     description: 'Breathtaking views of Ethiopia\'s highest peaks',
-    thumbnail: 'https://images.pexels.com/photos/1624496/pexels-photo-1624496.jpeg',
+    thumbnail: 'https://plus.unsplash.com/premium_photo-1661963813165-de22e1c7d406?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     videoId: 'ME3rb2kd5C8', // Example 360° video ID
     duration: '2 min',
   },
@@ -32,7 +32,7 @@ const vrExperiences = [
     id: '3',
     title: 'Gonder Castle',
     description: 'Journey to one of the greatest castles in Africa',
-    thumbnail: 'https://images.pexels.com/photos/2901209/pexels-photo-2901209.jpeg',
+    thumbnail: 'https://whc.unesco.org/uploads/thumbs/site_0019_0001-1200-630-20151104170938.jpg',
     videoId: '9X9glTHr1PQ', // Example 360° video ID
     duration: '3 min',
   },
@@ -274,13 +274,11 @@ const generateVRHTML = (videoId: string, title: string) => `
         }
 
         function openInYouTube() {
-            // Try to open in YouTube app, fallback to browser
-            window.location.href = 'vnd.youtube://watch?v=${videoId}';
-            setTimeout(() => {
-                window.location.href = 'https://www.youtube.com/watch?v=${videoId}';
-            }, 500);
+            // Open directly in Chrome browser with the web URL
+            const webUrl = 'https://www.youtube.com/watch?v=${videoId}';
+            window.open(webUrl, '_system');
         }
-        
+
         // Hide controls after 5 seconds
         setTimeout(() => {
             document.getElementById('vrOverlay').style.opacity = '0.3';
@@ -333,7 +331,6 @@ const generateVRHTML = (videoId: string, title: string) => `
 </body>
 </html>
 `;
-
 export default function VRScreen() {
   const [selectedExperience, setSelectedExperience] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
