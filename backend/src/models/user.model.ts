@@ -5,11 +5,20 @@ const userSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String },
+    password: { type: String, required: true },
     role: { type: String, enum: ["traveler", "provider", "admin"], required: true },
+
+    // Traveler-specific
     interests: [{ type: String }],
-    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+
+    // Provider-specific
+    bio: { type: String },
+    location: { type: String },
+    description: { type: String },
+    photos: [{ type: String }],
+
     expoPushToken: { type: String, default: null },
-    password: { type: String, required: true }
+    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
   },
   { timestamps: true }
 );

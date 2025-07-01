@@ -11,7 +11,7 @@ interface RegisterForm {
   confirmPassword: string
   bio: string
   location: string
-  experienceDescription: string
+  description: string
 }
 
 export default function Register() {
@@ -217,13 +217,13 @@ export default function Register() {
                 Demo Experience Description
               </label>
               <textarea
-                {...register('experienceDescription', { required: 'Experience description is required' })}
+                {...register('description', { required: 'Experience description is required' })}
                 rows={3}
                 className="mt-1 input-field"
                 placeholder="Describe a sample experience you would like to offer..."
               />
-              {errors.experienceDescription && (
-                <p className="mt-1 text-sm text-red-600">{errors.experienceDescription.message}</p>
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
               )}
             </div>
 
