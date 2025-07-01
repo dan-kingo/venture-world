@@ -10,16 +10,17 @@ import User from "../models/user.model";
  */
 export const createExperience = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, image, price, category } = req.body;
+    const { title, description, price, category } = req.body;
+    console.log(req.file)
 
-    if (!title || !description || !image || !category) {
+    if (!title || !description || !req.file || !category) {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
 
     // Find the user by Firebase UID
     const user = await User.findOne({ _id: req.user?._id });
-    
+    console.log("iD",req.user?._id)
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -28,7 +29,7 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
     const experience = new Experience({
       title,
       description,
-      image,
+      image: `/uploads/${req.file.filename}`, // Assuming req.file.path contains the uploaded image path
       price,
       category,
       provider: user._id, // Use MongoDB ObjectId

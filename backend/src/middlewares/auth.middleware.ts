@@ -17,8 +17,8 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET! || 'yoursecretkey') as { _id: string, role: string };
-    req.user = { _id: new mongoose.Types.ObjectId(decoded._id), role: decoded.role };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET! || 'yoursecretkey') as { userId: string, role: string };
+    req.user = { _id: new mongoose.Types.ObjectId(decoded.userId), role: decoded.role };
     next();
   } catch (err) {
     res.status(401).json({ message: "Invalid token" });
