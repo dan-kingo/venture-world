@@ -21,7 +21,7 @@ export default function Sidebar() {
   const { logout, user } = useAuthStore()
 
   return (
-    <div className="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col">
+    <div className="w-64 bg-white shadow-sm border-r border-gray-200 flex flex-col h-screen fixed top-0 left-0">
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">

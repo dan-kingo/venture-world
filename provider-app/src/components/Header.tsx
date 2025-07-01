@@ -5,10 +5,16 @@ export default function Header() {
   const { user } = useAuthStore()
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="px-6 py-4">
+    <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 md:left-64 z-10">
+      <div className="px-4 md:px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex-1 max-w-lg">
+          {/* Mobile search button - shows only on mobile */}
+          <button className="md:hidden p-2 text-gray-500 hover:text-gray-600">
+            <Search className="w-5 h-5" />
+          </button>
+
+          {/* Desktop search bar - hidden on mobile */}
+          <div className="hidden md:block flex-1 max-w-lg">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
@@ -25,7 +31,15 @@ export default function Header() {
               <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
 
-            <div className="flex items-center space-x-3">
+            {/* Mobile user avatar - shows only on mobile */}
+            <div className="md:hidden w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+              <span className="text-sm font-medium text-white">
+                {user?.name?.charAt(0)}
+              </span>
+            </div>
+
+            {/* Desktop user info - hidden on mobile */}
+            <div className="hidden md:flex items-center space-x-3">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500 capitalize">{user?.status}</p>
