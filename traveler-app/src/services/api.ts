@@ -229,7 +229,7 @@ export const experiencesAPI = {
       // Fallback to mock data
       throw new Error('Backend not available');
     } catch (error) {
-      console.error('Get experiences error:', error);
+      // console.error('Get experiences error:', error);
       throw error;
     }
   },
@@ -245,7 +245,7 @@ export const experiencesAPI = {
       
       throw new Error('Backend not available');
     } catch (error) {
-      console.error('Get experience by ID error:', error);
+      // console.error('Get experience by ID error:', error);
       throw error;
     }
   },
@@ -261,7 +261,7 @@ export const experiencesAPI = {
       
       throw new Error('Backend not available');
     } catch (error) {
-      console.error('Get my experiences error:', error);
+      // console.error('Get my experiences error:', error);
       throw error;
     }
   },
@@ -277,7 +277,7 @@ export const experiencesAPI = {
       
       throw new Error('Backend not available');
     } catch (error) {
-      console.error('Create experience error:', error);
+      // console.error('Create experience error:', error);
       throw error;
     }
   },
@@ -298,7 +298,7 @@ export const bookingsAPI = {
       await new Promise(resolve => setTimeout(resolve, 1000));
       return { success: true, bookingId: `mock-booking-${Date.now()}` };
     } catch (error) {
-      console.error('Create booking error:', error);
+      // console.error('Create booking error:', error);
       throw error;
     }
   },
@@ -315,7 +315,7 @@ export const bookingsAPI = {
       // Return empty array for mock
       return [];
     } catch (error) {
-      console.error('Get my bookings error:', error);
+      // console.error('Get my bookings error:', error);
       throw error;
     }
   },
@@ -334,7 +334,7 @@ export const itinerariesAPI = {
       
       throw new Error('Backend not available');
     } catch (error) {
-      console.error('Get itineraries error:', error);
+      // console.error('Get itineraries error:', error);
       throw error;
     }
   },
