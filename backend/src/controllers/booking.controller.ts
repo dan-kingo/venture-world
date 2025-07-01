@@ -27,7 +27,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
     }
 
     // Find the user by Firebase UID
-    const user = await User.findOne({ _id: req.user?.uid });
+    const user = await User.findOne({ _id: req.user?._id });
     
     if (!user) {
       res.status(404).json({ message: "User not found" });
@@ -68,7 +68,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   try {
     // Find the user by Firebase UID
-    const user = await User.findOne({ _id: req.user?.uid });
+    const user = await User.findOne({ _id: req.user?._id });
     
     if (!user) {
       res.status(404).json({ message: "User not found" });

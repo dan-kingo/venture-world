@@ -6,7 +6,7 @@ export interface IUser extends Document {
   email?: string;
   role: "traveler" | "provider" | "admin";
   interests?: string[];
-  status: "pending" | "approved" | "rejected";
+  status?: "pending" | "approved" | "rejected";
   password: string;
   bio?: string;
   location?: string;

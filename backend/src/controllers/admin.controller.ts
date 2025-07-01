@@ -9,6 +9,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
  * @access Private (admin only)
  */
 export const getPendingProviders = async (req: AuthRequest, res: Response) => {
+  console.log(req.user)
   try {
     const providers = await User.find({ role: "provider", status: "pending" });
     res.json(providers);
