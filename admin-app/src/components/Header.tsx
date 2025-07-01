@@ -5,7 +5,7 @@ export default function Header() {
   const { user } = useAuthStore()
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-white shadow-sm border-b border-gray-200 fixed top-0 left-0 right-0 md:left-64 z-10">
       <div className="px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex-1 max-w-lg">

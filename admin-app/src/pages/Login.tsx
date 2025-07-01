@@ -98,13 +98,7 @@ export default function Login() {
               )}
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="text-sm font-medium text-blue-900 mb-2">Demo Admin Account</h4>
-              <p className="text-sm text-blue-700">
-                Email: <code className="bg-blue-100 px-1 rounded">admin@example.com</code><br />
-                Password: <code className="bg-blue-100 px-1 rounded">admin123</code>
-              </p>
-            </div>
+           
 
             <button
               type="submit"

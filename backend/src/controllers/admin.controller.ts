@@ -3,7 +3,7 @@ import User from "../models/user.model";
 import Experience from "../models/experience.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 
-/**
+/** 
  * @desc Get all pending providers
  * @route GET /api/admin/providers
  * @access Private (admin only)
