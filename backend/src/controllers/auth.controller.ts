@@ -21,58 +21,46 @@ export const register = async (req: Request, res: Response) => {
     bio,
     location,
     description,
-    photos,
     expoPushToken,
   } = req.body;
 
   console.log("Incoming registration:", { name, email, role });
 
-  // Basic required fields
   if (!name || !role || !password) {
-    console.warn("Missing required fields.");
      res.status(400).json({ message: "Name, role, and password are required." });
-    return;
+     return
   }
 
-  // Validate role value
   if (!["traveler", "provider", "admin"].includes(role)) {
-    console.warn("Invalid role provided:", role);
      res.status(400).json({ message: "Invalid role." });
-    return;
+     return
   }
 
   try {
-    // Check for duplicate email
     if (email) {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        console.warn("Email already exists:", email);
          res.status(409).json({ message: "User with this email already exists." });
-        return;
+         return
       }
     }
 
-    // Traveler-specific validation
     if (role === "traveler") {
       if (!interests || !Array.isArray(interests) || interests.length === 0) {
-        console.warn("Missing interests for traveler.");
          res.status(400).json({ message: "Interests are required for travelers." });
-        return;
+         return
       }
     }
 
-    // Provider-specific validation
     if (role === "provider") {
       if (!bio || !location || !description) {
-        console.warn("Missing required fields for provider.");
          res.status(400).json({ message: "All provider fields are required." });
-        return;
+         return
       }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Prepare user object
     const newUser: any = {
       name,
       email,
@@ -86,32 +74,28 @@ export const register = async (req: Request, res: Response) => {
     }
 
     if (role === "provider") {
+      const photos = (req.files as Express.Multer.File[] || []).map(file => `/uploads/${file.filename}`);
       newUser.bio = bio;
       newUser.location = location;
       newUser.description = description;
       newUser.photos = photos;
-      newUser.status = "pending"; // Only providers get status
+      newUser.status = "pending";
     }
 
     const user = await User.create(newUser);
-
     const token = generateToken(user._id.toString(), user.role);
-
-    console.log("User registered successfully:", user._id);
 
     res.status(201).json({ token, user });
   } catch (err: any) {
     console.error("Registration error:", err);
-
-    // Handle potential unique key errors gracefully
     if (err.code === 11000 && err.keyPattern?.email) {
        res.status(409).json({ message: "Email already exists." });
-        return;
+       return
     }
-
     res.status(500).json({ message: "Registration failed. Please try again later." });
   }
 };
+
 
 
 

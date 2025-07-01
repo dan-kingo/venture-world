@@ -23,6 +23,37 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
+userSchema.set("toJSON", {
+  transform: function (doc, ret) {
+    delete ret.__v;
+    delete ret.password;
+
+    if (ret.role === "admin") {
+      delete ret.name;
+      delete ret.interests;
+      delete ret.bio;
+      delete ret.location;
+      delete ret.description;
+      delete ret.photos;
+      delete ret.status;
+    }
+
+    if (ret.role === "traveler") {
+      delete ret.bio;
+      delete ret.location;
+      delete ret.description;
+      delete ret.photos;
+      delete ret.status;
+    }
+
+    if (ret.role === "provider") {
+      delete ret.interests;
+    }
+
+    return ret;
+  },
+});
+
 const User = model<IUser>("User", userSchema);
 
 export default User;
