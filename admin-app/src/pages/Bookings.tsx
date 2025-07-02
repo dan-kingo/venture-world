@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Calendar, User, MapPin, DollarSign, Search, Filter } from 'lucide-react'
+import { Calendar, User, MapPin, DollarSign, Search, Filter, Check } from 'lucide-react'
 import { useAdminStore } from '../stores/adminStore'
 
 export default function Bookings() {
-  const { bookings, fetchBookings, isLoading } = useAdminStore()
+  const { bookings, fetchBookings, confirmBooking, isLoading } = useAdminStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'confirmed' | 'cancelled'>('all')
 
@@ -29,6 +29,12 @@ export default function Bookings() {
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const handleConfirmBooking = async (id: string) => {
+    if (window.confirm('Are you sure you want to confirm this booking?')) {
+      await confirmBooking(id)
     }
   }
 
@@ -199,13 +205,17 @@ export default function Bookings() {
                     {new Date(booking.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button className="text-primary-600 hover:text-primary-900 mr-3">
-                      View Details
-                    </button>
                     {booking.status === 'pending' && (
-                      <button className="text-green-600 hover:text-green-900">
-                        Confirm
+                      <button 
+                        onClick={() => handleConfirmBooking(booking._id)}
+                        className="text-green-600 hover:text-green-900 flex items-center space-x-1"
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>Confirm</span>
                       </button>
+                    )}
+                    {booking.status === 'confirmed' && (
+                      <span className="text-gray-500">Confirmed</span>
                     )}
                   </td>
                 </tr>

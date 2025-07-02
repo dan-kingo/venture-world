@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 interface ExperienceForm {
   title: string
   description: string
+  location: string
   price: number
   category: 'AR site' | 'eco-tour' | 'heritage'
 }
@@ -50,9 +51,13 @@ export default function AddExperience() {
 
   const onSubmit = async (data: ExperienceForm) => {
     try {
+      if (!image) {
+        throw new Error('Please upload an image for your experience')
+      }
+
       await addExperience({
         ...data,
-        image: image || 'https://images.pexels.com/photos/5011647/pexels-photo-5011647.jpeg'
+        image: image
       })
       navigate('/experiences')
     } catch (error) {
@@ -98,6 +103,25 @@ export default function AddExperience() {
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+            )}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+              Location
+            </label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                {...register('location', { required: 'Location is required' })}
+                type="text"
+                className="input-field pl-10"
+                placeholder="e.g., Lalibela, Ethiopia"
+              />
+            </div>
+            {errors.location && (
+              <p className="mt-1 text-sm text-red-600">{errors.location.message}</p>
             )}
           </div>
 
@@ -165,7 +189,7 @@ export default function AddExperience() {
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Experience Image
+              Experience Image *
             </label>
             {!image ? (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -185,6 +209,7 @@ export default function AddExperience() {
                     className="sr-only"
                     accept="image/*"
                     onChange={handleImageUpload}
+                    required
                   />
                 </div>
               </div>

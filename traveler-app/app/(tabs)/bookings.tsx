@@ -7,41 +7,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { router } from 'expo-router';
 
 import { colors, spacing } from '../../src/theme/theme';
-import { bookingsAPI } from '../../src/services/api';
-
-// Mock booking data for when backend is not available
-const mockBookings = [
-  {
-    id: '1',
-    experienceTitle: 'Lalibela Rock Churches AR Tour',
-    experienceImage: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    status: 'confirmed',
-    date: '2024-02-15',
-    time: '10:00 AM',
-    price: 150,
-    provider: 'Ethiopian Heritage Tours',
-  },
-  {
-    id: '2',
-    experienceTitle: 'Bale Mountains Eco Adventure',
-    experienceImage: 'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npUivll5ZGs3cjeGa5WEmKYr-xE1BiwaG8sfp8s0NTb7DgZc5iiPrim1dsy-VpFds5p5z1VMu4NwKgDz0DBrsFnW0TYtIo154l-p5vfbFxV9CdPv-teIUETdISbiNK1Nso3Um-z=s680-w680-h510-rw',
-    status: 'pending',
-    date: '2024-02-20',
-    time: '8:00 AM',
-    price: 200,
-    provider: 'Mountain Adventures Ethiopia',
-  },
-  {
-    id: '3',
-    experienceTitle: 'Coffee Ceremony Cultural Experience',
-    experienceImage: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg',
-    status: 'completed',
-    date: '2024-01-10',
-    time: '2:00 PM',
-    price: 50,
-    provider: 'Cultural Connections',
-  },
-];
+import { bookingsAPI, Booking } from '../../src/services/api';
 
 const statusColors = {
   pending: colors.warning,
@@ -51,7 +17,7 @@ const statusColors = {
 };
 
 export default function BookingsScreen() {
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -62,10 +28,10 @@ export default function BookingsScreen() {
     setIsLoading(true);
     try {
       const data = await bookingsAPI.getMine();
-      setBookings(data.length > 0 ? data : mockBookings);
+      setBookings(data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
-      setBookings(mockBookings);
+      setBookings([]);
     } finally {
       setIsLoading(false);
     }
@@ -81,16 +47,16 @@ export default function BookingsScreen() {
     fontSize: 12,
   });
 
-  const renderBooking = ({ item, index }: { item: any; index: number }) => (
+  const renderBooking = ({ item, index }: { item: Booking; index: number }) => (
     <Animated.View entering={FadeInDown.delay(index * 100)}>
       <Card style={styles.bookingCard}>
         <View style={styles.bookingContent}>
-          <Card.Cover source={{ uri: item.experienceImage }} style={styles.bookingImage} />
+          <Card.Cover source={{ uri: item.experience.image }} style={styles.bookingImage} />
           
           <View style={styles.bookingDetails}>
             <View style={styles.bookingHeader}>
               <Text style={styles.bookingTitle} numberOfLines={2}>
-                {item.experienceTitle}
+                {item.experience.title}
               </Text>
               <Chip
                 style={getStatusChipStyle(item.status)}
@@ -100,16 +66,14 @@ export default function BookingsScreen() {
               </Chip>
             </View>
             
-            <Text style={styles.bookingProvider}>{item.provider}</Text>
+            <Text style={styles.bookingLocation}>📍 {item.experience.location}</Text>
             
             <View style={styles.bookingInfo}>
-              <Text style={styles.bookingDate}>📅 {item.date}</Text>
-              <Text style={styles.bookingTime}>🕐 {item.time}</Text>
+              <Text style={styles.bookingDate}>📅 {new Date(item.createdAt).toLocaleDateString()}</Text>
+              <Text style={styles.bookingPrice}>${item.experience.price}</Text>
             </View>
             
             <View style={styles.bookingFooter}>
-              <Text style={styles.bookingPrice}>${item.price}</Text>
-              
               <View style={styles.bookingActions}>
                 {item.status === 'pending' && (
                   <Button
@@ -184,7 +148,7 @@ export default function BookingsScreen() {
           <FlatList
             data={bookings}
             renderItem={renderBooking}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             contentContainerStyle={[styles.bookingsList, { paddingBottom: 100 }]}
             showsVerticalScrollIndicator={false}
             refreshing={isLoading}
@@ -256,7 +220,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: spacing.sm,
   },
-  bookingProvider: {
+  bookingLocation: {
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
     color: colors.textSecondary,
@@ -264,7 +228,8 @@ const styles = StyleSheet.create({
   },
   bookingInfo: {
     flexDirection: 'row',
-    gap: spacing.md,
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: spacing.md,
   },
   bookingDate: {
@@ -272,20 +237,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-Regular',
     color: colors.textSecondary,
   },
-  bookingTime: {
-    fontSize: 12,
-    fontFamily: 'Poppins-Regular',
-    color: colors.textSecondary,
+  bookingPrice: {
+    fontSize: 18,
+    fontFamily: 'Poppins-Bold',
+    color: colors.primary,
   },
   bookingFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  bookingPrice: {
-    fontSize: 18,
-    fontFamily: 'Poppins-Bold',
-    color: colors.primary,
   },
   bookingActions: {
     flexDirection: 'row',

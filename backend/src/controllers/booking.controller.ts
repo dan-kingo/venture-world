@@ -26,7 +26,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Find the user by Firebase UID
+    // Find the user by ID
     const user = await User.findOne({ _id: req.user?._id });
     
     if (!user) {
@@ -67,7 +67,7 @@ export const createBooking = async (req: AuthRequest, res: Response) => {
  */
 export const getMyBookings = async (req: AuthRequest, res: Response) => {
   try {
-    // Find the user by Firebase UID
+    // Find the user by ID
     const user = await User.findOne({ _id: req.user?._id });
     
     if (!user) {
@@ -76,12 +76,48 @@ export const getMyBookings = async (req: AuthRequest, res: Response) => {
     }
 
     const bookings = await Booking.find({ traveler: user._id })
-      .populate("experience", "title category")
+      .populate("experience", "title category image price location")
       .sort({ createdAt: -1 });
 
     res.json(bookings);
   } catch (err) {
     console.error("Error fetching bookings:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * @desc Confirm a booking (admin only)
+ * @route PATCH /api/bookings/:id/confirm
+ * @access Private (admin only)
+ */
+export const confirmBooking = async (req: AuthRequest, res: Response) => {
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status: "confirmed" },
+      { new: true }
+    ).populate("experience", "title")
+     .populate("traveler", "name email");
+
+    if (!booking) {
+      res.status(404).json({ message: "Booking not found" });
+      return;
+    }
+
+    // Notify the traveler
+    const traveler = await User.findById(booking.traveler);
+    if (traveler?.expoPushToken) {
+      await sendExpoNotification(
+        traveler.expoPushToken,
+        "Booking Confirmed",
+        `Your booking for ${booking.experience?.title} has been confirmed!`
+      );
+    }
+
+    res.json({ message: "Booking confirmed", booking });
+  } catch (err) {
+    console.error("Error confirming booking:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

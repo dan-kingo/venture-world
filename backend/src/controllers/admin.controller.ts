@@ -190,3 +190,29 @@ export const sendNotification = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+/**
+ * @desc Confirm a booking
+ * @route PATCH /api/admin/bookings/:id/confirm
+ * @access Private (admin only)
+ */
+export const confirmBooking = async (req: AuthRequest, res: Response) => {
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status: "confirmed" },
+      { new: true }
+    ).populate("experience", "title")
+     .populate("traveler", "name email");
+
+    if (!booking) {
+      res.status(404).json({ message: "Booking not found" });
+      return;
+    }
+
+    res.json({ message: "Booking confirmed", booking });
+  } catch (err) {
+    console.error("Error confirming booking:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

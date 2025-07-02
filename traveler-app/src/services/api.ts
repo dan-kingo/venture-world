@@ -64,7 +64,23 @@ export interface Experience {
   location: string;
 }
 
-
+export interface Booking {
+  _id: string;
+  experience: {
+    _id: string;
+    title: string;
+    image: string;
+    price: number;
+    location: string;
+  };
+  traveler: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  status: 'pending' | 'confirmed' | 'cancelled';
+  createdAt: string;
+}
 
 // Mock users for testing
 const mockUsers = [
@@ -171,6 +187,7 @@ export const mockExperiences: Experience[] = [
     location: 'Harar',
   },
 ];
+
 // Check if backend is available
 const checkBackendAvailability = async (): Promise<boolean> => {
   try {
@@ -184,48 +201,48 @@ const checkBackendAvailability = async (): Promise<boolean> => {
 
 // Auth API with backend integration
 export const authAPI = {
-
   login: async (email: string, password: string) => {
-  try {
-    const isBackendAvailable = await checkBackendAvailability();
+    try {
+      const isBackendAvailable = await checkBackendAvailability();
 
-    if (isBackendAvailable) {
-      try {
-        const response = await api.post('/auth/login', { email, password });
-        const { token, user } = response.data;
+      if (isBackendAvailable) {
+        try {
+          const response = await api.post('/auth/login', { email, password });
+          const { token, user } = response.data;
 
-        await SecureStore.setItemAsync('authToken', token);
-        await SecureStore.setItemAsync('user', JSON.stringify(user));
+          await SecureStore.setItemAsync('authToken', token);
+          await SecureStore.setItemAsync('user', JSON.stringify(user));
 
-        return user;
-      } catch (backendError) {
-        console.log('Backend login failed, falling back to mock login');
+          return user;
+        } catch (backendError) {
+          console.log('Backend login failed, falling back to mock login');
+        }
       }
+
+      // Mock Login Fallback
+      const user = mockUsers.find(
+        (u) => u.email === email && u.password === password
+      );
+
+      if (!user) {
+        throw new Error("Invalid credentials (mock)");
+      }
+
+      const token = `mock-token-${user.id}-${Date.now()}`;
+
+      await SecureStore.setItemAsync('authToken', token);
+      const { password: _, ...userWithoutPassword } = user;
+      await SecureStore.setItemAsync('user', JSON.stringify(userWithoutPassword));
+
+      return userWithoutPassword;
+
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     }
+  },
 
-    // Mock Login Fallback
-    const user = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (!user) {
-      throw new Error("Invalid credentials (mock)");
-    }
-
-    const token = `mock-token-${user.id}-${Date.now()}`;
-
-    await SecureStore.setItemAsync('authToken', token);
-    const { password: _, ...userWithoutPassword } = user;
-    await SecureStore.setItemAsync('user', JSON.stringify(userWithoutPassword));
-
-    return userWithoutPassword;
-
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  }
-},
-register: async (userData: any) => {
+  register: async (userData: any) => {
     try {
       const isBackendAvailable = await checkBackendAvailability();
 
@@ -245,6 +262,7 @@ register: async (userData: any) => {
       throw error;
     }
   },
+
   logout: async () => {
     try {
       await SecureStore.deleteItemAsync('authToken');
@@ -254,6 +272,36 @@ register: async (userData: any) => {
     }
   },
 
+  updateProfile: async (profileData: any) => {
+    try {
+      const isBackendAvailable = await checkBackendAvailability();
+      
+      if (isBackendAvailable) {
+        try {
+          const response = await api.put('/auth/profile', profileData);
+          const updatedUser = response.data.user;
+          await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+          return updatedUser;
+        } catch (backendError) {
+          console.log('Backend profile update failed');
+        }
+      }
+      
+      // Fallback: update local storage
+      const storedUser = await SecureStore.getItemAsync('user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        const updatedUser = { ...user, ...profileData };
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      }
+      
+      throw new Error('No user found');
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error;
+    }
+  },
 
   setupProfile: async (profileData: any) => {
     try {
@@ -282,7 +330,7 @@ register: async (userData: any) => {
       
       if (isBackendAvailable) {
         try {
-          const response = await api.get('/me');
+          const response = await api.get('/auth/me');
           if (response.data) {
             await SecureStore.setItemAsync('user', JSON.stringify(response.data));
           }
@@ -403,12 +451,12 @@ export const bookingsAPI = {
 
   getMine: async () => {
     try {
-      // const isBackendAvailable = await checkBackendAvailability();
+      const isBackendAvailable = await checkBackendAvailability();
       
-      // if (isBackendAvailable) {
-      //   const response = await api.get('/bookings/mine');
-      //   return response.data;
-      // }
+      if (isBackendAvailable) {
+        const response = await api.get('/bookings/mine');
+        return response.data;
+      }
       
       // Return empty array for mock
       return [];

@@ -13,8 +13,8 @@ export default function Users() {
 
   const filteredUsers = users.filter(user => {
     const matchesRole = roleFilter === 'all' || user.role === roleFilter
-    const matchesSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = (user.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         (user.email || '').toLowerCase().includes(searchQuery.toLowerCase())
     return matchesRole && matchesSearch
   })
 
@@ -187,14 +187,14 @@ export default function Users() {
                     <div className="flex items-center">
                       <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                         <span className="text-sm font-medium text-gray-600">
-                          {user.name.charAt(0)}
+                          {(user.name || 'U').charAt(0)}
                         </span>
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                        <div className="text-sm font-medium text-gray-900">{user.name || 'Unknown'}</div>
                         <div className="text-sm text-gray-500 flex items-center">
                           <Mail className="w-3 h-3 mr-1" />
-                          {user.email}
+                          {user.email || 'No email'}
                         </div>
                       </div>
                     </div>

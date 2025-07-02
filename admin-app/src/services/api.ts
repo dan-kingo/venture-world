@@ -127,6 +127,15 @@ export const adminAPI = {
     }
   },
 
+  confirmBooking: async (id: string) => {
+    try {
+      const response = await api.patch(`/admin/bookings/${id}/confirm`)
+      return response.data
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to confirm booking')
+    }
+  },
+
   sendNotification: async (data: any) => {
     try {
       const response = await api.post('/admin/notifications', data)

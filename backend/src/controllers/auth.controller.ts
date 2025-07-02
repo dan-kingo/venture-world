@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/user.model";
 import { generateToken } from "../utils/jwt";
+import { AuthRequest } from "../middlewares/auth.middleware";
 
 // Extend Express Request interface to include userId
 declare module "express-serve-static-core" {
@@ -9,7 +10,6 @@ declare module "express-serve-static-core" {
     userId?: string;
   }
 }
-
 
 export const register = async (req: Request, res: Response) => {
   const {
@@ -96,9 +96,6 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-
-
-
 export const login = async (req: Request, res: Response) => {
   const { email, password, expoPushToken } = req.body;
 
@@ -133,3 +130,61 @@ export const login = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Login failed.", error: err });
   }
 }
+
+/**
+ * @desc Update user profile
+ * @route PUT /api/auth/profile
+ * @access Private
+ */
+export const updateProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const { name, email, interests, bio, location, description } = req.body;
+
+    const user = await User.findById(req.user?._id);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    // Update fields based on user role
+    if (name) user.name = name;
+    if (email) user.email = email;
+    
+    if (user.role === 'traveler' && interests) {
+      user.interests = interests;
+    }
+    
+    if (user.role === 'provider') {
+      if (bio) user.bio = bio;
+      if (location) user.location = location;
+      if (description) user.description = description;
+    }
+
+    await user.save();
+
+    res.json({ message: "Profile updated successfully", user });
+  } catch (err) {
+    console.error("Error updating profile:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+/**
+ * @desc Get current user profile
+ * @route GET /api/auth/me
+ * @access Private
+ */
+export const getProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    const user = await User.findById(req.user?._id).select('-password');
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error("Error getting profile:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

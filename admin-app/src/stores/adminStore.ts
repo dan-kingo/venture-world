@@ -75,6 +75,7 @@ interface AdminState {
   
   // Booking actions
   fetchBookings: () => Promise<void>
+  confirmBooking: (id: string) => Promise<void>
   
   // Notification actions
   sendNotification: (data: { title: string; message: string; type: string; target: string }) => Promise<void>
@@ -184,6 +185,20 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch bookings')
+    }
+  },
+
+  confirmBooking: async (id: string) => {
+    try {
+      await adminAPI.confirmBooking(id)
+      set(state => ({
+        bookings: state.bookings.map(booking =>
+          booking._id === id ? { ...booking, status: 'confirmed' as const } : booking
+        )
+      }))
+      toast.success('Booking confirmed successfully')
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to confirm booking')
     }
   },
 

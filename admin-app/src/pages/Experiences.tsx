@@ -138,7 +138,7 @@ export default function Experiences() {
       {/* Experiences List */}
       <div className="space-y-4">
         {filteredExperiences.map((experience) => (
-          <div key={experience.id} className="card">
+          <div key={experience._id} className="card">
             <div className="flex items-start space-x-6">
               <img
                 src={experience.image}
@@ -184,14 +184,14 @@ export default function Experiences() {
                     {experience.status === 'pending' && (
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleApprove(experience.id)}
+                          onClick={() => handleApprove(experience._id)}
                           className="btn-success flex items-center space-x-1 text-sm"
                         >
                           <Check className="w-4 h-4" />
                           <span>Approve</span>
                         </button>
                         <button
-                          onClick={() => handleReject(experience.id)}
+                          onClick={() => handleReject(experience._id)}
                           className="btn-danger flex items-center space-x-1 text-sm"
                         >
                           <X className="w-4 h-4" />

@@ -64,15 +64,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   updateProfile: async (userData: Partial<User>) => {
-    const currentUser = get().user;
-    if (currentUser) {
-      const updatedUser = { ...currentUser, ...userData };
-      try {
-        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
-        set({ user: updatedUser });
-      } catch (error) {
-        console.error('Update profile error:', error);
-      }
+    try {
+      const updatedUser = await authAPI.updateProfile(userData);
+      set({ user: updatedUser });
+    } catch (error) {
+      console.error('Update profile error:', error);
+      throw error;
     }
   },
 

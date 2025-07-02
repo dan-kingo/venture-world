@@ -9,6 +9,7 @@ import {
   getUsers,
   getBookings,
   sendNotification,
+  confirmBooking,
 } from "../controllers/admin.controller";
 import { authenticate, authorize } from "../middlewares/auth.middleware";
 
@@ -29,6 +30,7 @@ router.get("/users", authenticate, authorize(["admin"]), getUsers);
 
 // Booking routes
 router.get("/bookings", authenticate, authorize(["admin"]), getBookings);
+router.patch("/bookings/:id/confirm", authenticate, authorize(["admin"]), confirmBooking);
 
 // Notification routes
 router.post("/notifications", authenticate, authorize(["admin"]), sendNotification);
