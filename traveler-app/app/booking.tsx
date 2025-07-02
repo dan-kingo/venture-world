@@ -30,7 +30,7 @@ export default function BookingScreen() {
 
   // Find the item based on the ID from params
   const experience = experienceId 
-    ? experiences.find(exp => exp.id === experienceId) 
+    ? experiences.find(exp => exp._id === experienceId) 
     : null;
   const itinerary = itineraryId 
     ? itineraries.find(it => it.id === itineraryId) 
@@ -66,7 +66,7 @@ export default function BookingScreen() {
     setIsLoading(true);
     try {
       if (experience) {
-        await bookExperience(experience.id);
+        await bookExperience(experience._id);
       } else if (itinerary) {
         await bookItinerary(itinerary.id, {
           date: selectedDate,

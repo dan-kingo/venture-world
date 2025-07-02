@@ -403,12 +403,12 @@ export const bookingsAPI = {
 
   getMine: async () => {
     try {
-      const isBackendAvailable = await checkBackendAvailability();
+      // const isBackendAvailable = await checkBackendAvailability();
       
-      if (isBackendAvailable) {
-        const response = await api.get('/bookings/mine');
-        return response.data;
-      }
+      // if (isBackendAvailable) {
+      //   const response = await api.get('/bookings/mine');
+      //   return response.data;
+      // }
       
       // Return empty array for mock
       return [];
