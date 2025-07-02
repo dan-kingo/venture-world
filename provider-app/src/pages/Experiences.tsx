@@ -41,7 +41,7 @@ export default function Experiences() {
       try {
         await deleteExperience(id)
       } catch (error) {
-        // Error is handled by the store
+        console.error('Error deleting experience:', error)
       }
     }
   }
@@ -92,7 +92,7 @@ export default function Experiences() {
       ) : (
         <div className="space-y-6">
           {experiences.map((experience) => (
-            <div key={experience.id} className="card">
+            <div key={experience._id} className="card">
               <div className="flex items-start space-x-6">
                 <img
                   src={experience.image}
@@ -117,6 +117,7 @@ export default function Experiences() {
                         <span className="font-semibold text-gray-900">
                           ${experience.price}
                         </span>
+                        <span>📍 {experience.location}</span>
                       </div>
 
                       <div className="flex items-center space-x-6 text-sm text-gray-500">
@@ -147,7 +148,7 @@ export default function Experiences() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDelete(experience.id)}
+                          onClick={() => handleDelete(experience._id)}
                           className="p-2 text-gray-400 hover:text-red-600 transition-colors"
                           title="Delete experience"
                         >

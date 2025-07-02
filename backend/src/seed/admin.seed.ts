@@ -6,8 +6,8 @@ import User from "../models/user.model";
 dotenv.config();
 
 const seedAdmin = async () => {
-  const adminEmail = process.env.ADMIN_EMAIL || "";
-  const adminPassword = process.env.ADMIN_PASSWORD || "admin@"; 
+  const adminEmail = "admin@example.com";
+  const adminPassword = "admin123";
 
   try {
     await mongoose.connect(process.env.MONGO_URI_LOCAL!);
@@ -22,13 +22,15 @@ const seedAdmin = async () => {
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
 
     await User.create({
-      name: "Admin",
+      name: "Admin User",
       email: adminEmail,
       password: hashedPassword,
       role: "admin",
     });
 
     console.log("🎉 Admin user created successfully.");
+    console.log(`Email: ${adminEmail}`);
+    console.log(`Password: ${adminPassword}`);
     process.exit(0);
   } catch (err) {
     console.error("❌ Failed to seed admin user:", err);

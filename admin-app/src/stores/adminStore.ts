@@ -3,7 +3,7 @@ import { adminAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
 interface Provider {
-  id: string
+  _id: string
   name: string
   email: string
   bio: string
@@ -14,7 +14,7 @@ interface Provider {
 }
 
 interface Experience {
-  id: string
+  _id: string
   title: string
   description: string
   image: string
@@ -22,14 +22,15 @@ interface Experience {
   category: 'AR site' | 'eco-tour' | 'heritage'
   status: 'pending' | 'approved' | 'rejected'
   provider: {
-    id: string
+    _id: string
     name: string
   }
+  location: string
   createdAt: string
 }
 
 interface User {
-  id: string
+  _id: string
   name: string
   email: string
   role: string
@@ -38,13 +39,13 @@ interface User {
 }
 
 interface Booking {
-  id: string
+  _id: string
   experience: {
-    id: string
+    _id: string
     title: string
   }
   traveler: {
-    id: string
+    _id: string
     name: string
     email: string
   }
@@ -76,7 +77,7 @@ interface AdminState {
   fetchBookings: () => Promise<void>
   
   // Notification actions
-  sendNotification: (data: { title: string; message: string; type: string }) => Promise<void>
+  sendNotification: (data: { title: string; message: string; type: string; target: string }) => Promise<void>
 }
 
 export const useAdminStore = create<AdminState>((set, get) => ({
@@ -90,7 +91,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isLoading: true })
     try {
       const response = await adminAPI.getProviders()
-      set({ providers: response.providers, isLoading: false })
+      set({ providers: response.providers || [], isLoading: false })
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch providers')
@@ -102,7 +103,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       await adminAPI.approveProvider(id)
       set(state => ({
         providers: state.providers.map(provider =>
-          provider.id === id ? { ...provider, status: 'approved' as const } : provider
+          provider._id === id ? { ...provider, status: 'approved' as const } : provider
         )
       }))
       toast.success('Provider approved successfully')
@@ -116,7 +117,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       await adminAPI.rejectProvider(id)
       set(state => ({
         providers: state.providers.map(provider =>
-          provider.id === id ? { ...provider, status: 'rejected' as const } : provider
+          provider._id === id ? { ...provider, status: 'rejected' as const } : provider
         )
       }))
       toast.success('Provider rejected')
@@ -129,7 +130,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isLoading: true })
     try {
       const response = await adminAPI.getExperiences()
-      set({ experiences: response.experiences, isLoading: false })
+      set({ experiences: response.experiences || [], isLoading: false })
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch experiences')
@@ -141,7 +142,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       await adminAPI.approveExperience(id)
       set(state => ({
         experiences: state.experiences.map(experience =>
-          experience.id === id ? { ...experience, status: 'approved' as const } : experience
+          experience._id === id ? { ...experience, status: 'approved' as const } : experience
         )
       }))
       toast.success('Experience approved successfully')
@@ -155,7 +156,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
       await adminAPI.rejectExperience(id)
       set(state => ({
         experiences: state.experiences.map(experience =>
-          experience.id === id ? { ...experience, status: 'rejected' as const } : experience
+          experience._id === id ? { ...experience, status: 'rejected' as const } : experience
         )
       }))
       toast.success('Experience rejected')
@@ -168,7 +169,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isLoading: true })
     try {
       const response = await adminAPI.getUsers()
-      set({ users: response.users, isLoading: false })
+      set({ users: response.users || [], isLoading: false })
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch users')
@@ -179,7 +180,7 @@ export const useAdminStore = create<AdminState>((set, get) => ({
     set({ isLoading: true })
     try {
       const response = await adminAPI.getBookings()
-      set({ bookings: response.bookings, isLoading: false })
+      set({ bookings: response.bookings || [], isLoading: false })
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch bookings')

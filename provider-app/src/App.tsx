@@ -9,6 +9,7 @@ import AddExperience from './pages/AddExperience'
 import Experiences from './pages/Experiences'
 import Profile from './pages/Profile'
 import LoadingSpinner from './components/LoadingSpinner'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   const { isAuthenticated, isLoading, initializeAuth } = useAuthStore()
@@ -32,8 +33,16 @@ function App() {
       ) : (
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="experiences" element={<Experiences />} />
-          <Route path="add-experience" element={<AddExperience />} />
+          <Route path="experiences" element={
+            <ProtectedRoute requireApproval>
+              <Experiences />
+            </ProtectedRoute>
+          } />
+          <Route path="add-experience" element={
+            <ProtectedRoute requireApproval>
+              <AddExperience />
+            </ProtectedRoute>
+          } />
           <Route path="profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

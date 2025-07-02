@@ -1,18 +1,36 @@
 import { Router } from "express";
 import {
-  getPendingProviders,
+  getProviders,
   approveProvider,
-  getPendingExperiences,
+  rejectProvider,
+  getExperiences,
   approveExperience,
+  rejectExperience,
+  getUsers,
+  getBookings,
+  sendNotification,
 } from "../controllers/admin.controller";
-import {  authenticate, authorize } from "../middlewares/auth.middleware";
+import { authenticate, authorize } from "../middlewares/auth.middleware";
 
 const router = Router();
 
-router.get("/providers",authenticate, authorize(["admin"]), getPendingProviders);
+// Provider routes
+router.get("/providers", authenticate, authorize(["admin"]), getProviders);
 router.patch("/providers/:id/approve", authenticate, authorize(["admin"]), approveProvider);
+router.patch("/providers/:id/reject", authenticate, authorize(["admin"]), rejectProvider);
 
-router.get("/experiences",authenticate, authorize(["admin"]), getPendingExperiences);
-router.patch("/experiences/:id/approve",authenticate, authorize(["admin"]), approveExperience);
+// Experience routes
+router.get("/experiences", authenticate, authorize(["admin"]), getExperiences);
+router.patch("/experiences/:id/approve", authenticate, authorize(["admin"]), approveExperience);
+router.patch("/experiences/:id/reject", authenticate, authorize(["admin"]), rejectExperience);
+
+// User routes
+router.get("/users", authenticate, authorize(["admin"]), getUsers);
+
+// Booking routes
+router.get("/bookings", authenticate, authorize(["admin"]), getBookings);
+
+// Notification routes
+router.post("/notifications", authenticate, authorize(["admin"]), sendNotification);
 
 export default router;

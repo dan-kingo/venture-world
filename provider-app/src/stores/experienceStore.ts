@@ -3,7 +3,7 @@ import { experienceAPI } from '../services/api'
 import toast from 'react-hot-toast'
 
 interface Experience {
-  id: string
+  _id: string
   title: string
   description: string
   image: string
@@ -11,6 +11,7 @@ interface Experience {
   category: 'AR site' | 'eco-tour' | 'heritage'
   status: 'pending' | 'approved' | 'rejected'
   provider: string
+  location: string
   createdAt: string
   views?: number
   bookings?: number
@@ -19,7 +20,7 @@ interface Experience {
 interface ExperienceState {
   experiences: Experience[]
   isLoading: boolean
-  addExperience: (experienceData: Omit<Experience, 'id' | 'status' | 'provider' | 'createdAt'>) => Promise<void>
+  addExperience: (experienceData: Omit<Experience, '_id' | 'status' | 'provider' | 'createdAt'>) => Promise<void>
   fetchExperiences: () => Promise<void>
   updateExperience: (id: string, data: Partial<Experience>) => Promise<void>
   deleteExperience: (id: string) => Promise<void>
@@ -49,7 +50,7 @@ export const useExperienceStore = create<ExperienceState>((set, get) => ({
     set({ isLoading: true })
     try {
       const response = await experienceAPI.getMine()
-      set({ experiences: response.experiences, isLoading: false })
+      set({ experiences: response.experiences || [], isLoading: false })
     } catch (error: any) {
       set({ isLoading: false })
       toast.error(error.message || 'Failed to fetch experiences')
@@ -61,7 +62,7 @@ export const useExperienceStore = create<ExperienceState>((set, get) => ({
       const response = await experienceAPI.update(id, data)
       set(state => ({
         experiences: state.experiences.map(exp => 
-          exp.id === id ? { ...exp, ...response.experience } : exp
+          exp._id === id ? { ...exp, ...response.experience } : exp
         )
       }))
       toast.success('Experience updated successfully')
@@ -75,7 +76,7 @@ export const useExperienceStore = create<ExperienceState>((set, get) => ({
     try {
       await experienceAPI.delete(id)
       set(state => ({
-        experiences: state.experiences.filter(exp => exp.id !== id)
+        experiences: state.experiences.filter(exp => exp._id !== id)
       }))
       toast.success('Experience deleted successfully')
     } catch (error: any) {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL ='http://localhost:3000/api'
+const API_BASE_URL = 'http://localhost:3000/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -35,36 +35,6 @@ api.interceptors.response.use(
   }
 )
 
-// Mock data for development
-const mockExperiences = [
-  {
-    id: '1',
-    title: 'Lalibela Rock Churches AR Tour',
-    description: 'Experience the ancient rock-hewn churches through augmented reality',
-    image: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-    price: 150,
-    category: 'AR site' as const,
-    status: 'approved' as const,
-    provider: 'provider-1',
-    createdAt: '2024-01-15',
-    views: 45,
-    bookings: 8
-  },
-  {
-    id: '2',
-    title: 'Coffee Ceremony Experience',
-    description: 'Learn about Ethiopian coffee culture in an authentic ceremony',
-    image: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg',
-    price: 50,
-    category: 'heritage' as const,
-    status: 'pending' as const,
-    provider: 'provider-1',
-    createdAt: '2024-01-20',
-    views: 12,
-    bookings: 2
-  }
-]
-
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
@@ -74,41 +44,44 @@ export const authAPI = {
       }
       return response.data
     } catch (error: any) {
-      // Fallback to mock for development
-      if (email === 'provider@example.com' && password === 'password123') {
-        const mockUser = {
-          id: 'provider-1',
-          name: 'John Provider',
-          email: 'provider@example.com',
-          role: 'provider',
-          bio: 'Experienced tour guide specializing in Ethiopian heritage sites',
-          location: 'Addis Ababa, Ethiopia',
-          status: 'approved' as const,
-          photos: ['https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg']
-        }
-        localStorage.setItem('auth-token', 'mock-token-provider')
-        return { user: mockUser, token: 'mock-token-provider' }
-      }
-      throw new Error('Invalid credentials')
+      throw new Error(error.response?.data?.message || 'Login failed')
     }
   },
 
   register: async (userData: any) => {
     try {
-      const response = await api.post('/auth/register', userData)
+      const formData = new FormData()
+      
+      // Add text fields
+      Object.keys(userData).forEach(key => {
+        if (key !== 'photos') {
+          formData.append(key, userData[key])
+        }
+      })
+      
+      // Add photos if they exist
+      if (userData.photos && userData.photos.length > 0) {
+        userData.photos.forEach((photo: string, index: number) => {
+          // Convert base64 to blob if needed
+          if (photo.startsWith('data:')) {
+            const blob = dataURLtoBlob(photo)
+            formData.append('photos', blob, `photo-${index}.jpg`)
+          }
+        })
+      }
+
+      const response = await api.post('/auth/register', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      
       if (response.data.token) {
         localStorage.setItem('auth-token', response.data.token)
       }
       return response.data
     } catch (error: any) {
-      // Mock registration for development
-      const mockUser = {
-        id: `provider-${Date.now()}`,
-        ...userData,
-        status: 'pending' as const
-      }
-      localStorage.setItem('auth-token', `mock-token-${mockUser.id}`)
-      return { user: mockUser, token: `mock-token-${mockUser.id}` }
+      throw new Error(error.response?.data?.message || 'Registration failed')
     }
   },
 
@@ -122,8 +95,7 @@ export const authAPI = {
       const response = await api.put('/auth/profile', userData)
       return response.data
     } catch (error: any) {
-      // Mock update for development
-      return { user: userData }
+      throw new Error(error.response?.data?.message || 'Failed to update profile')
     }
   }
 }
@@ -131,20 +103,31 @@ export const authAPI = {
 export const experienceAPI = {
   create: async (experienceData: any) => {
     try {
-      const response = await api.post('/experiences', experienceData)
+      const formData = new FormData()
+      
+      // Add text fields
+      Object.keys(experienceData).forEach(key => {
+        if (key !== 'image') {
+          formData.append(key, experienceData[key])
+        }
+      })
+      
+      // Add image if it exists
+      if (experienceData.image) {
+        if (experienceData.image.startsWith('data:')) {
+          const blob = dataURLtoBlob(experienceData.image)
+          formData.append('image', blob, 'experience-image.jpg')
+        }
+      }
+
+      const response = await api.post('/experiences', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
       return response.data
     } catch (error: any) {
-      // Mock creation for development
-      const mockExperience = {
-        id: `exp-${Date.now()}`,
-        ...experienceData,
-        status: 'pending' as const,
-        provider: 'provider-1',
-        createdAt: new Date().toISOString(),
-        views: 0,
-        bookings: 0
-      }
-      return { experience: mockExperience }
+      throw new Error(error.response?.data?.message || 'Failed to create experience')
     }
   },
 
@@ -153,8 +136,7 @@ export const experienceAPI = {
       const response = await api.get('/experiences/mine')
       return response.data
     } catch (error: any) {
-      // Mock data for development
-      return { experiences: mockExperiences }
+      throw new Error(error.response?.data?.message || 'Failed to fetch experiences')
     }
   },
 
@@ -163,8 +145,7 @@ export const experienceAPI = {
       const response = await api.put(`/experiences/${id}`, data)
       return response.data
     } catch (error: any) {
-      // Mock update for development
-      return { experience: { id, ...data } }
+      throw new Error(error.response?.data?.message || 'Failed to update experience')
     }
   },
 
@@ -173,10 +154,22 @@ export const experienceAPI = {
       const response = await api.delete(`/experiences/${id}`)
       return response.data
     } catch (error: any) {
-      // Mock delete for development
-      return { success: true }
+      throw new Error(error.response?.data?.message || 'Failed to delete experience')
     }
   }
+}
+
+// Helper function to convert data URL to blob
+function dataURLtoBlob(dataurl: string) {
+  const arr = dataurl.split(',')
+  const mime = arr[0].match(/:(.*?);/)![1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new Blob([u8arr], { type: mime })
 }
 
 export default api
