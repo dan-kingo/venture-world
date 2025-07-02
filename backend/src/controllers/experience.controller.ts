@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Experience from "../models/experience.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import User from "../models/user.model";
-
+import getRandomRating from "../utils/generateRating";
 /**
  * @desc Provider submits new experience
  * @route POST /api/experiences
@@ -10,9 +10,11 @@ import User from "../models/user.model";
  */
 export const createExperience = async (req: AuthRequest, res: Response) => {
   try {
-    const { title, description, price, category } = req.body;
+    const { title, description,location, price, category } = req.body;
+  const fileUrl = req.file?.path || null;
 
-    if (!title || !description || !req.file || !category) {
+
+    if (!title || !description || !req.file || !category || !req.body.location) {
       res.status(400).json({ message: "All fields are required" });
       return;
     }
@@ -27,8 +29,10 @@ export const createExperience = async (req: AuthRequest, res: Response) => {
     const experience = new Experience({
       title,
       description,
-      image: `/uploads/${req.file.filename}`, // Assuming req.file.path contains the uploaded image path
+      image: fileUrl, // Assuming req.file.path contains the uploaded image path
       price,
+      location,
+      rating: getRandomRating(), // Generate a random rating
       category,
       provider: user._id, // Use MongoDB ObjectId
       status: "pending",
