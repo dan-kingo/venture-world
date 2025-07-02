@@ -85,3 +85,21 @@ export const getMyExperiences = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const getExperienceById = async (req: Request, res: Response) => {
+  try {
+    const experienceId = req.params.id;
+    const experience = await Experience.findById(experienceId).populate("provider", "name");
+
+    if (!experience) {
+       res.status(404).json({ message: "Experience not found" });
+       return
+    }
+
+    res.json(experience);
+  } catch (err) {
+    console.error("Error fetching experience:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}

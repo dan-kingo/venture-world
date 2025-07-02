@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
+import { mockExperiences } from '../store/experienceStore';
 
 // Backend URL - update this to match your backend server
 const API_BASE_URL =  'http://192.168.0.118:3000/api';
@@ -243,12 +244,18 @@ export const experiencesAPI = {
         return response.data;
       }
       
-      throw new Error('Backend not available');
+      // Fallback to mock data lookup
+      const mockExperience = mockExperiences.find(exp => exp._id === id);
+      if (!mockExperience) {
+        throw new Error('Experience not found in mock data');
+      }
+      return mockExperience;
     } catch (error) {
-      // console.error('Get experience by ID error:', error);
+      console.error('Get experience by ID error:', error);
       throw error;
     }
   },
+  
 
   getMine: async () => {
     try {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { Text, Card, Button, IconButton, Chip } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,20 +7,35 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { colors, spacing } from '../../src/theme/theme';
-import { useExperienceStore } from '../../src/store/experienceStore';
+import { Experience, useExperienceStore } from '../../src/store/experienceStore';
 
 const { width } = Dimensions.get('window');
 
 // Mock experience data - in real app, fetch based on ID
 
 export default function ExperienceDetailScreen() {
+
   const { id } = useLocalSearchParams();
-  const { experiences } = useExperienceStore();
-  
+  console.log(id, 'Experience ID from params');
+  const { fetchExperienceById,experiences } = useExperienceStore();
+   const [experience, setExperience] = useState<Experience | null>(null);
+
+  useEffect(() => {
+    // First check if we already have it in store
+    const existing = experiences.find(exp => exp._id === id);
+    if (existing) {
+      setExperience(existing);
+      return;
+    }
+    
+    // Otherwise fetch it
+    fetchExperienceById(id as string)
+      .then(setExperience)
+      .catch(console.error);
+  }, [id, fetchExperienceById, experiences]);
   
   // Find the experience by ID
-  const experience = experiences.find(exp => exp.id === id);
-
+ 
   // If experience not found or still loading, show nothing (you might want to add loading/error states)
   if (!experience) {
     return null;
@@ -120,7 +135,7 @@ export default function ExperienceDetailScreen() {
             </View>
             <Button
               mode="contained"
-              onPress={() => router.push(`/booking?experience=${experience.id}`)}
+              onPress={() => router.push(`/booking?experience=${experience._id}`)}
               style={styles.bookButton}
               labelStyle={styles.bookButtonLabel}
             >
@@ -225,7 +240,7 @@ export default function ExperienceDetailScreen() {
                 </Text>
                 <Button
                   mode="contained"
-                  onPress={() => router.push(`/booking?experience=${experience.id}`)}
+                  onPress={() => router.push(`/booking?experience=${experience._id}`)}
                   style={styles.bottomBookButton}
                   labelStyle={styles.bottomBookButtonLabel}
                 >

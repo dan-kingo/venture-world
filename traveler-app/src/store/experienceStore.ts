@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 import { experiencesAPI, bookingsAPI } from '../services/api';
 
-interface Experience {
-  id: string;
+export interface Experience {
+  _id: string;
   title: string;
   description: string;
   image: string;
   price?: number;
   category: 'AR site' | 'eco-tour' | 'heritage';
   provider: {
-    id: string;
+    _id: string;
     name: string;
   };
   rating: number;
@@ -23,80 +23,81 @@ interface ExperienceState {
   isLoading: boolean;
   error: string | null;
   fetchExperiences: () => Promise<void>;
+  fetchExperienceById: (id: string) => Promise<Experience | null>;
   fetchFeaturedExperiences: () => Promise<void>;
   bookExperience: (experienceId: string) => Promise<void>;
 }
 
 // Mock data - will be replaced by API calls when backend is available
-const mockExperiences: Experience[] = [
+export const mockExperiences: Experience[] = [
   {
-    id: '1',
+    _id: '1',
     title: 'Lalibela Rock Churches AR Tour',
     description: 'Experience the ancient rock-hewn churches through augmented reality with historical insights.',
     image: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     price: 150,
     category: 'AR site',
-    provider: { id: '1', name: 'Ethiopian Heritage Tours' },
+    provider: { _id: '1', name: 'Ethiopian Heritage Tours' },
     rating: 4.8,
     duration: '3 hours',
     location: 'Lalibela',
   },
   {
-    id: '2',
+    _id: '2',
     title: 'Bale Mountains Eco Adventure',
     description: 'Explore the stunning Bale Mountains with expert guides and spot rare wildlife.',
     image: 'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npUivll5ZGs3cjeGa5WEmKYr-xE1BiwaG8sfp8s0NTb7DgZc5iiPrim1dsy-VpFds5p5z1VMu4NwKgDz0DBrsFnW0TYtIo154l-p5vfbFxV9CdPv-teIUETdISbiNK1Nso3Um-z=s680-w680-h510-rw',
     price: 200,
     category: 'eco-tour',
-    provider: { id: '2', name: 'Mountain Adventures Ethiopia' },
+    provider: { _id: '2', name: 'Mountain Adventures Ethiopia' },
     rating: 4.9,
     duration: 'Full day',
     location: 'Bale Mountains',
   },
   {
-    id: '3',
+    _id: '3',
     title: 'Axum Obelisks Heritage Walk',
     description: 'Discover the ancient kingdom of Axum and its mysterious obelisks.',
     image: 'https://cdn.britannica.com/23/93423-050-107B2836/obelisk-kingdom-Aksum-Ethiopian-name-city.jpg',
     price: 100,
     category: 'heritage',
-    provider: { id: '3', name: 'Ancient Ethiopia Tours' },
+    provider: { _id: '3', name: 'Ancient Ethiopia Tours' },
     rating: 4.7,
     duration: '2 hours',
     location: 'Axum',
   },
   {
-    id: '4',
+    _id: '4',
     title: 'Coffee Ceremony Cultural Experience',
     description: 'Learn about Ethiopian coffee culture in an authentic ceremony.',
     image: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg',
     price: 50,
     category: 'heritage',
-    provider: { id: '4', name: 'Cultural Connections' },
+    provider: { _id: '4', name: 'Cultural Connections' },
     rating: 4.6,
     duration: '1.5 hours',
     location: 'Addis Ababa',
   },
   {
-    id: '5',
+    _id: '5',
     title: 'Simien Mountains VR Experience',
     description: 'Virtual reality tour of the breathtaking Simien Mountains landscape.',
     image: 'https://plus.unsplash.com/premium_photo-1661963813165-de22e1c7d406?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     price: 75,
     category: 'eco-tour',
-    provider: { id: '5', name: 'VR Ethiopia Adventures' },
+    provider: { _id: '5', name: 'VR Ethiopia Adventures' },
     rating: 4.5,
     duration: '45 minutes',
     location: 'Simien Mountains',
   },
   {
-    id: '6',
+    _id: '6',
     title: 'Harar Old City Heritage Tour',
     description: 'Explore the ancient walled city of Harar with its unique architecture.',
     image: 'https://www.shutterstock.com/image-photo/harar-ethiopia-july-262014-gate-260nw-208874200.jpg',
     price: 120,
     category: 'heritage',
-    provider: { id: '6', name: 'Harar Cultural Tours' },
+    provider: { _id: '6', name: 'Harar Cultural Tours' },
     rating: 4.4,
     duration: '4 hours',
     location: 'Harar',
@@ -154,6 +155,47 @@ export const useExperienceStore = create<ExperienceState>((set, get) => ({
         isLoading: false,
         featuredExperiences: mockExperiences.slice(0, 3) // Fallback to mock data
       });
+    }
+  },
+
+  fetchExperienceById: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      // First check if we have it in local state
+      const existing = get().experiences.find(exp => exp._id === id);
+      if (existing) {
+        set({ isLoading: false });
+        return existing;
+      }
+      
+      // Try to fetch from API
+      try {
+        const experience = await experiencesAPI.getById(id);
+        set(state => ({
+          experiences: [...state.experiences, experience], // Add to cache
+          isLoading: false
+        }));
+        return experience;
+      } catch (apiError) {
+        console.log('API not available, checking mock data');
+        // Check mock data
+        const mockExp = mockExperiences.find(exp => exp._id === id);
+        if (mockExp) {
+          set(state => ({
+            experiences: [...state.experiences, mockExp], // Add to cache
+            isLoading: false
+          }));
+          return mockExp;
+        }
+        throw new Error('Experience not found');
+      }
+    } catch (error) {
+      console.error('Error fetching experience:', error);
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to load experience',
+        isLoading: false
+      });
+      throw error;
     }
   },
 
