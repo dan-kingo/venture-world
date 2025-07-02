@@ -111,7 +111,7 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
       await sendExpoNotification(
         traveler.expoPushToken,
         "Booking Confirmed",
-        `Your booking for ${booking.experience?.title} has been confirmed!`
+        `Your booking has been confirmed!`
       );
     }
 
