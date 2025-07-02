@@ -13,9 +13,9 @@ export default function Bookings() {
 
   const filteredBookings = bookings.filter(booking => {
     const matchesStatus = statusFilter === 'all' || booking.status === statusFilter
-    const matchesSearch = booking.experience.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         booking.traveler.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         booking.traveler.email.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSearch = booking.experience?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         booking.traveler?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         booking.traveler?.email?.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesStatus && matchesSearch
   })
 
@@ -96,7 +96,9 @@ export default function Bookings() {
             <DollarSign className="h-8 w-8 text-green-600" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Revenue</p>
-              <p className="text-2xl font-semibold text-gray-900">$12,450</p>
+              <p className="text-2xl font-semibold text-gray-900">
+                ${(bookings.filter(b => b.status === 'confirmed').length * 150).toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
@@ -164,12 +166,12 @@ export default function Bookings() {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredBookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-gray-50">
+                <tr key={booking._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <MapPin className="w-4 h-4 text-gray-400 mr-2" />
                       <div className="text-sm font-medium text-gray-900">
-                        {booking.experience.title}
+                        {booking.experience?.title || 'Unknown Experience'}
                       </div>
                     </div>
                   </td>
@@ -179,8 +181,12 @@ export default function Bookings() {
                         <User className="w-4 h-4 text-gray-600" />
                       </div>
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{booking.traveler.name}</div>
-                        <div className="text-sm text-gray-500">{booking.traveler.email}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {booking.traveler?.name || 'Unknown User'}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {booking.traveler?.email || 'No email'}
+                        </div>
                       </div>
                     </div>
                   </td>

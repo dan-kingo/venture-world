@@ -13,46 +13,6 @@ import {
 import { useAdminStore } from '../stores/adminStore'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts'
 
-const stats = [
-  {
-    name: 'Total Users',
-    value: '1,234',
-    change: '+12%',
-    changeType: 'positive',
-    icon: Users,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-  },
-  {
-    name: 'Active Providers',
-    value: '89',
-    change: '+8%',
-    changeType: 'positive',
-    icon: UserCheck,
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
-  },
-  {
-    name: 'Total Experiences',
-    value: '156',
-    change: '+15%',
-    changeType: 'positive',
-    icon: MapPin,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
-  },
-  {
-    name: 'Total Bookings',
-    value: '2,456',
-    change: '+23%',
-    changeType: 'positive',
-    icon: Calendar,
-    color: 'text-primary-600',
-    bgColor: 'bg-primary-100',
-  },
-  
-]
-
 const chartData = [
   { name: 'Jan', users: 400, bookings: 240, revenue: 2400, experiences: 12 },
   { name: 'Feb', users: 300, bookings: 139, revenue: 2210, experiences: 15 },
@@ -118,41 +78,6 @@ const recentActivity = [
   }
 ]
 
-const topExperiences = [
-  {
-    id: '1',
-    title: 'Lalibela Rock Churches AR Tour',
-    bookings: 45,
-    revenue: '$6,750',
-    rating: 4.9,
-    image: 'https://images.unsplash.com/flagged/photo-1572644973628-e9be84915d59?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-  },
-  {
-    id: '2',
-    title: 'Coffee Ceremony Cultural Experience',
-    bookings: 38,
-    revenue: '$1,900',
-    rating: 4.8,
-    image: 'https://images.pexels.com/photos/894695/pexels-photo-894695.jpeg'
-  },
-  {
-    id: '3',
-    title: 'Bale Mountains Eco Adventure',
-    bookings: 32,
-    revenue: '$6,400',
-    rating: 4.7,
-    image: 'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npUivll5ZGs3cjeGa5WEmKYr-xE1BiwaG8sfp8s0NTb7DgZc5iiPrim1dsy-VpFds5p5z1VMu4NwKgDz0DBrsFnW0TYtIo154l-p5vfbFxV9CdPv-teIUETdISbiNK1Nso3Um-z=s680-w680-h510-rw'
-  },
-  {
-    id: '4',
-    title: 'Axum Obelisks Heritage Walk',
-    bookings: 28,
-    revenue: '$2,800',
-    rating: 4.6,
-    image: 'https://cdn.britannica.com/23/93423-050-107B2836/obelisk-kingdom-Aksum-Ethiopian-name-city.jpg'
-  }
-]
-
 const systemHealth = [
   { name: 'API Response Time', value: '245ms', status: 'good', color: 'text-green-600' },
   { name: 'Database Performance', value: '98.5%', status: 'good', color: 'text-green-600' },
@@ -161,18 +86,117 @@ const systemHealth = [
 ]
 
 export default function Dashboard() {
-  const { providers, experiences, fetchProviders, fetchExperiences, fetchUsers, fetchBookings } = useAdminStore()
+  const { 
+    providers, 
+    experiences, 
+    users, 
+    bookings,
+    fetchProviders, 
+    fetchExperiences, 
+    fetchUsers, 
+    fetchBookings,
+    isLoading 
+  } = useAdminStore()
 
   useEffect(() => {
-    fetchProviders()
-    fetchExperiences()
-    fetchUsers()
-    fetchBookings()
+    // Fetch all data when component mounts
+    const fetchAllData = async () => {
+      try {
+        await Promise.all([
+          fetchProviders(),
+          fetchExperiences(),
+          fetchUsers(),
+          fetchBookings()
+        ])
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      }
+    }
+
+    fetchAllData()
   }, [fetchProviders, fetchExperiences, fetchUsers, fetchBookings])
 
+  // Calculate real stats from database
+  const totalUsers = users.length
+  const totalProviders = providers.length
+  const approvedProviders = providers.filter(p => p.status === 'approved').length
   const pendingProviders = providers.filter(p => p.status === 'pending').length
+  const totalExperiences = experiences.length
+  const approvedExperiences = experiences.filter(e => e.status === 'approved').length
   const pendingExperiences = experiences.filter(e => e.status === 'pending').length
+  const totalBookings = bookings.length
+  const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length
+
+  // Calculate total revenue (mock calculation based on bookings)
+  const totalRevenue = confirmedBookings * 150 // Average price per booking
+
+  const stats = [
+    {
+      name: 'Total Users',
+      value: totalUsers.toString(),
+      change: '+12%',
+      changeType: 'positive',
+      icon: Users,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100',
+    },
+    {
+      name: 'Active Providers',
+      value: approvedProviders.toString(),
+      change: '+8%',
+      changeType: 'positive',
+      icon: UserCheck,
+      color: 'text-green-600',
+      bgColor: 'bg-green-100',
+    },
+    {
+      name: 'Total Experiences',
+      value: totalExperiences.toString(),
+      change: '+15%',
+      changeType: 'positive',
+      icon: MapPin,
+      color: 'text-purple-600',
+      bgColor: 'bg-purple-100',
+    },
+    {
+      name: 'Total Bookings',
+      value: totalBookings.toString(),
+      change: '+23%',
+      changeType: 'positive',
+      icon: Calendar,
+      color: 'text-primary-600',
+      bgColor: 'bg-primary-100',
+    },
+  ]
+
+  // Get top experiences from database
+  const topExperiences = experiences
+    .filter(e => e.status === 'approved')
+    .slice(0, 4)
+    .map((exp, index) => ({
+      id: exp._id,
+      title: exp.title,
+      bookings: Math.floor(Math.random() * 50) + 10, // Mock booking count
+      revenue: `$${(Math.floor(Math.random() * 5000) + 1000).toLocaleString()}`,
+      rating: 4.5 + Math.random() * 0.5,
+      image: exp.image
+    }))
+
   const totalPendingActions = pendingProviders + pendingExperiences
+
+  if (isLoading && totalUsers === 0) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="animate-pulse space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg p-6">
+              <div className="h-20 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -344,45 +368,47 @@ export default function Dashboard() {
       </div>
 
       {/* Top Performing Experiences */}
-      <div className="card">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">Top Performing Experiences</h3>
-          <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-            View All
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {topExperiences.map((experience, index) => (
-            <div key={experience.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-gray-500">#{index + 1}</span>
-                <div className="flex items-center">
-                  <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                  <span className="text-sm font-medium text-gray-900">{experience.rating}</span>
+      {topExperiences.length > 0 && (
+        <div className="card">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900">Top Performing Experiences</h3>
+            <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+              View All
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {topExperiences.map((experience, index) => (
+              <div key={experience.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium text-gray-500">#{index + 1}</span>
+                  <div className="flex items-center">
+                    <Star className="w-4 h-4 text-yellow-400 mr-1" />
+                    <span className="text-sm font-medium text-gray-900">{experience.rating.toFixed(1)}</span>
+                  </div>
+                </div>
+                <img 
+                  src={experience.image} 
+                  alt={experience.title}
+                  className="w-full h-24 object-cover rounded-lg mb-3"
+                />
+                <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
+                  {experience.title}
+                </h4>
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">Bookings:</span>
+                    <span className="font-medium text-gray-900">{experience.bookings}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-500">Revenue:</span>
+                    <span className="font-medium text-emerald-600">{experience.revenue}</span>
+                  </div>
                 </div>
               </div>
-              <img 
-                src={experience.image} 
-                alt={experience.title}
-                className="w-full h-24 object-cover rounded-lg mb-3"
-              />
-              <h4 className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-                {experience.title}
-              </h4>
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Bookings:</span>
-                  <span className="font-medium text-gray-900">{experience.bookings}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-500">Revenue:</span>
-                  <span className="font-medium text-emerald-600">{experience.revenue}</span>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Recent Activity & System Health */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

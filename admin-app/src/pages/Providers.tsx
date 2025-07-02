@@ -107,7 +107,7 @@ export default function Providers() {
       {/* Providers List */}
       <div className="space-y-4">
         {filteredProviders.map((provider) => (
-          <div key={provider.id} className="card">
+          <div key={provider._id} className="card">
             <div className="flex items-start space-x-6">
               {provider.photos && provider.photos.length > 0 ? (
                 <img
@@ -156,14 +156,14 @@ export default function Providers() {
                     {provider.status === 'pending' && (
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleApprove(provider.id)}
+                          onClick={() => handleApprove(provider._id)}
                           className="btn-success flex items-center space-x-1 text-sm"
                         >
                           <Check className="w-4 h-4" />
                           <span>Approve</span>
                         </button>
                         <button
-                          onClick={() => handleReject(provider.id)}
+                          onClick={() => handleReject(provider._id)}
                           className="btn-danger flex items-center space-x-1 text-sm"
                         >
                           <X className="w-4 h-4" />
