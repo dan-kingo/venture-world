@@ -120,12 +120,12 @@ export default function HomeScreen() {
 
             {featuredExperiences.map((experience, index) => (
               <Animated.View
-                key={experience.id}
+                key={experience._id}
                 entering={FadeInDown.delay(1000 + index * 100)}
               >
                 <Card
                   style={styles.experienceCard}
-                  onPress={() => router.push(`/experience/${experience.id}`)}
+                  onPress={() => router.push(`/experience/${experience._id}`)}
                 >
                   <Card.Cover
                     source={{ uri: experience.image }}

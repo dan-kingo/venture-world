@@ -7,7 +7,8 @@ import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { colors, spacing } from '../../src/theme/theme';
-import { Experience, useExperienceStore } from '../../src/store/experienceStore';
+import { useExperienceStore } from '../../src/store/experienceStore';
+import { Experience } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
 
@@ -16,7 +17,6 @@ const { width } = Dimensions.get('window');
 export default function ExperienceDetailScreen() {
 
   const { id } = useLocalSearchParams();
-  console.log(id, 'Experience ID from params');
   const { fetchExperienceById,experiences } = useExperienceStore();
    const [experience, setExperience] = useState<Experience | null>(null);
 

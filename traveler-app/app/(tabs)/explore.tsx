@@ -47,7 +47,7 @@ export default function ExploreScreen() {
     <Animated.View entering={FadeInDown.delay(index * 100)}>
       <Card
         style={styles.experienceCard}
-        onPress={() => router.push(`/experience/${item.id}`)}
+        onPress={() => router.push(`/experience/${item._id}`)}
       >
         <Card.Cover source={{ uri: item.image }} style={styles.experienceImage} />
         <Card.Content style={styles.experienceContent}>
