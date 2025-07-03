@@ -6,8 +6,8 @@ import User from "../models/user.model";
 dotenv.config();
 
 const seedAdmin = async () => {
-  const adminEmail = "admin@example.com";
-  const adminPassword = "admin123";
+  const adminEmail = process.env.ADMIN_EMAIL|| "admin@example.com";
+  const adminPassword =process.env.ADMIN_PASSWORD || "admin123";
 
   try {
     await mongoose.connect(process.env.MONGO_URI_LOCAL!);

@@ -109,9 +109,9 @@ export default function Providers() {
         {filteredProviders.map((provider) => (
           <div key={provider._id} className="card">
             <div className="flex items-start space-x-6">
-              {provider.photos && provider.photos.length > 0 ? (
+              {provider.images && provider.images.length > 0 ? (
                 <img
-                  src={provider.photos[0]}
+                  src={provider.images[0]}
                   alt={provider.name}
                   className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                 />
@@ -174,11 +174,11 @@ export default function Providers() {
                   </div>
                 </div>
 
-                {provider.photos && provider.photos.length > 1 && (
+                {provider.images && provider.images.length > 1 && (
                   <div className="mt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Additional Photos:</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Additional images:</p>
                     <div className="flex space-x-2">
-                      {provider.photos.slice(1).map((photo, index) => (
+                      {provider.images.slice(1).map((photo, index) => (
                         <img
                           key={index}
                           src={photo}

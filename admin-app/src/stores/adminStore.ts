@@ -10,7 +10,7 @@ interface Provider {
   location: string
   status: 'pending' | 'approved' | 'rejected'
   createdAt: string
-  photos?: string[]
+  images?: string[]
 }
 
 interface Experience {
