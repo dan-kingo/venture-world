@@ -121,3 +121,34 @@ export const confirmBooking = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const cancelBooking = async (req: AuthRequest, res: Response) => {
+  try {
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { status: "cancelled" },
+      { new: true }
+    ).populate("experience", "title")
+     .populate("traveler", "name email");
+
+    if (!booking) {
+      res.status(404).json({ message: "Booking not found" });
+      return;
+    }
+
+    // Notify the traveler
+    const traveler = await User.findById(booking.traveler);
+    if (traveler?.expoPushToken) {
+      await sendExpoNotification(
+        traveler.expoPushToken,
+        "Booking Cancelled",
+        `Your booking has been cancelled.`
+      );
+    }
+
+    res.json({ message: "Booking cancelled", booking });
+  } catch (err) {
+    console.error("Error cancelling booking:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}

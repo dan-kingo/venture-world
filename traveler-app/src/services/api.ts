@@ -78,7 +78,7 @@ export interface Booking {
     name: string;
     email: string;
   };
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   createdAt: string;
 }
 
@@ -465,6 +465,24 @@ export const bookingsAPI = {
       throw error;
     }
   },
+
+  cancelBooking: async (bookingId: string) => {
+    try {
+      const isBackendAvailable = await checkBackendAvailability();
+      
+      if (isBackendAvailable) {
+        const response = await api.put(`/bookings/${bookingId}`, { status: 'cancelled' });
+        return response.data;
+      }
+      
+      // Mock cancellation
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return { success: true, bookingId, status: 'cancelled' };
+    } catch (error) {
+      // console.error('Cancel booking error:', error);
+      throw error;
+    }
+  }
 };
 
 // Itineraries API with backend integration

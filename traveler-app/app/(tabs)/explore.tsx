@@ -142,7 +142,7 @@ export default function ExploreScreen() {
         <FlatList
           data={filteredExperiences}
           renderItem={renderExperience}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={[styles.experiencesList, { paddingBottom: 100 }]}

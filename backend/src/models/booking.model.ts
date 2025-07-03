@@ -5,7 +5,7 @@ const bookingSchema = new Schema<IBooking>(
   {
     experience: { type: Schema.Types.ObjectId, ref: "Experience", required: true },
     traveler: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    status: { type: String, enum: ["pending", "confirmed"], default: "pending" },
+    status: { type: String, enum: ["pending", "confirmed", "completed", "cancelled"], default: "pending" },
   },
   { timestamps: true }
 );
